@@ -1,0 +1,61 @@
+/* ============================================================================
+ * AegisBlock — Pre-Paint Cosmetic Ad & Tracker Container Filter
+ * Injected at document_start to prevent Cumulative Layout Shift (CLS).
+ * Instantly disarmed when :root[data-aegisblock-paused="true"] is set.
+ * ============================================================================ */
+
+:root:not([data-aegisblock-paused="true"]) ins.adsbygoogle,
+:root:not([data-aegisblock-paused="true"]) [id^="google_ads_iframe_"],
+:root:not([data-aegisblock-paused="true"]) [id^="div-gpt-ad-"],
+:root:not([data-aegisblock-paused="true"]) [data-google-query-id],
+:root:not([data-aegisblock-paused="true"]) [data-ad-client],
+:root:not([data-aegisblock-paused="true"]) [data-ad-slot],
+:root:not([data-aegisblock-paused="true"]) [data-ad-unit],
+:root:not([data-aegisblock-paused="true"]) [data-ad-name],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="doubleclick.net"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="googlesyndication.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="amazon-adsystem.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="adnxs.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="rubiconproject.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="criteo.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="taboola.com"],
+:root:not([data-aegisblock-paused="true"]) iframe[src*="outbrain.com"],
+:root:not([data-aegisblock-paused="true"]) .taboola-widget,
+:root:not([data-aegisblock-paused="true"]) [id^="taboola-"],
+:root:not([data-aegisblock-paused="true"]) .OUTBRAIN,
+:root:not([data-aegisblock-paused="true"]) [data-widget-id^="outbrain"],
+:root:not([data-aegisblock-paused="true"]) .rc-wc,
+:root:not([data-aegisblock-paused="true"]) [id^="rc-widget-"],
+:root:not([data-aegisblock-paused="true"]) [class*="mgid-widget"],
+:root:not([data-aegisblock-paused="true"]) .ad-leaderboard,
+:root:not([data-aegisblock-paused="true"]) .ad-billboard,
+:root:not([data-aegisblock-paused="true"]) .ad- skyscraper,
+:root:not([data-aegisblock-paused="true"]) .ad-slot-container,
+:root:not([data-aegisblock-paused="true"]) .dfp-ad-unit,
+:root:not([data-aegisblock-paused="true"]) .sponsored-banner,
+:root:not([data-aegisblock-paused="true"]) [aria-label="Advertisement"],
+:root:not([data-aegisblock-paused="true"]) [aria-label="Sponsored Ad"],
+:root:not([data-aegisblock-paused="true"]) ytd-ad-slot-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-in-feed-ad-layout-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-promoted-sparkles-web-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-promoted-video-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-display-ad-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-statement-banner-renderer,
+:root:not([data-aegisblock-paused="true"]) ytd-banner-promo-renderer,
+:root:not([data-aegisblock-paused="true"]) #masthead-ad,
+:root:not([data-aegisblock-paused="true"]) #player-ads,
+:root:not([data-aegisblock-paused="true"]) .ytp-ad-overlay-container,
+:root:not([data-aegisblock-paused="true"]) .ytp-ad-message-container,
+:root:not([data-aegisblock-paused="true"]) .ytp-featured-product,
+:root:not([data-aegisblock-paused="true"]) [data-aegis-hidden="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}

@@ -1,0 +1,134 @@
+[
+  {
+    "id": 3001,
+    "priority": 5,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "transform": {
+          "queryTransform": {
+            "removeParams": [
+              "utm_source",
+              "utm_medium",
+              "utm_campaign",
+              "utm_term",
+              "utm_content",
+              "utm_id",
+              "utm_name",
+              "utm_reader",
+              "utm_viz_id",
+              "utm_pubreferrer",
+              "utm_swu",
+              "_ga",
+              "_gl",
+              "_gac",
+              "gclid",
+              "gclsrc",
+              "dclid",
+              "wbraid",
+              "gbraid",
+              "srsltid",
+              "fbclid",
+              "fb_action_ids",
+              "fb_action_types",
+              "fb_source",
+              "igshid",
+              "igs",
+              "msclkid",
+              "twclid",
+              "ttclid",
+              "li_fat_id",
+              "epik",
+              "rdt_cid",
+              "sccid",
+              "yclid",
+              "ymclid",
+              "s_kwcid",
+              "wickedid",
+              "irclickid",
+              "cjevent",
+              "mc_cid",
+              "mc_eid",
+              "_hsenc",
+              "_hsmi",
+              "hsCtaTracking",
+              "mkt_tok",
+              "vero_id",
+              "oly_enc_id",
+              "oly_anon_id",
+              "rb_clickid",
+              "spm",
+              "scm",
+              "algo_exp_id",
+              "algo_pvid"
+            ]
+          }
+        }
+      }
+    },
+    "condition": {
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame"
+      ]
+    }
+  },
+  {
+    "id": 3002,
+    "priority": 5,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "Sec-Browsing-Topics",
+          "operation": "remove"
+        },
+        {
+          "header": "Sec-Ad-Auction-Fetch",
+          "operation": "remove"
+        },
+        {
+          "header": "X-Client-Data",
+          "operation": "remove"
+        }
+      ],
+      "responseHeaders": [
+        {
+          "header": "Observe-Browsing-Topics",
+          "operation": "remove"
+        },
+        {
+          "header": "NEL",
+          "operation": "remove"
+        },
+        {
+          "header": "Report-To",
+          "operation": "remove"
+        },
+        {
+          "header": "Reporting-Endpoints",
+          "operation": "remove"
+        }
+      ]
+    },
+    "condition": {
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  }
+]

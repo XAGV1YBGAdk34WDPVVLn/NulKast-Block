@@ -1,0 +1,15 @@
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local SQLite WAL databases & temporary dumps
+data/*.db
+data/*.db-shm
+data/*.db-wal
+scratch/
+
+# Secrets & environment files
+.env
+.env.*
+*cookies*.txt

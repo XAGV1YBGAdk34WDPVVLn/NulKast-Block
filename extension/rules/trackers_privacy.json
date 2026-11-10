@@ -1,0 +1,565 @@
+[
+  {
+    "id": 2001,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "analytics.google.com",
+        "app-measurement.com",
+        "crashlytics.com",
+        "firebaseinstallations.googleapis.com",
+        "firebaselogging-pa.googleapis.com",
+        "google-analytics.com",
+        "googletagmanager.com",
+        "googletagservices.com",
+        "ssl.google-analytics.com",
+        "www.google-analytics.com",
+        "www.googletagmanager.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2002,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "an.facebook.com",
+        "atdmt.com",
+        "connect.facebook.net",
+        "liverail.com",
+        "pixel.facebook.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2003,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "ads-twitter.com",
+        "alb.reddit.com",
+        "analytics.tiktok.com",
+        "analytics.twitter.com",
+        "business-api.tiktok.com",
+        "ct.pinterest.com",
+        "dc.ads.linkedin.com",
+        "events.redditmedia.com",
+        "px.ads.linkedin.com",
+        "snap.licdn.com",
+        "static.ads-twitter.com",
+        "tr.snapchat.com",
+        "trk.pinterest.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2004,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "c.clarity.ms",
+        "cdn.heapanalytics.com",
+        "cdn.logrocket.io",
+        "cdn.mouseflow.com",
+        "clarity.ms",
+        "contentsquare.net",
+        "crazyegg.com",
+        "decibelinsight.net",
+        "edge.fullstory.com",
+        "fullstory.com",
+        "glassboxdigital.io",
+        "heap.io",
+        "heapanalytics.com",
+        "hn.inspectlet.com",
+        "hotjar.com",
+        "hotjar.io",
+        "inspectlet.com",
+        "logrocket.com",
+        "logrocket.io",
+        "luckyorange.com",
+        "luckyorange.net",
+        "mouseflow.com",
+        "quantummetric.com",
+        "rec.smartlook.com",
+        "rs.fullstory.com",
+        "script.crazyegg.com",
+        "script.hotjar.com",
+        "smartlook.com",
+        "static.hotjar.com",
+        "vars.hotjar.com",
+        "www.clarity.ms"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2005,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "abtasty.com",
+        "amplitude.com",
+        "api.amplitude.com",
+        "api.mixpanel.com",
+        "api.segment.io",
+        "app.posthog.com",
+        "appboy.com",
+        "braze.com",
+        "cdn.amplitude.com",
+        "cdn.mxpnl.com",
+        "cdn.optimizely.com",
+        "cdn.segment.com",
+        "clevertap.com",
+        "dev.visualwebsiteoptimizer.com",
+        "hs-analytics.net",
+        "hs-scripts.com",
+        "hsadspixel.net",
+        "kameleoon.eu",
+        "kissmetrics.com",
+        "logx.optimizely.com",
+        "marketo.com",
+        "marketo.net",
+        "mixpanel.com",
+        "munchkin.marketo.net",
+        "optimizely.com",
+        "pardot.com",
+        "pi.pardot.com",
+        "posthog.com",
+        "rudderstack.com",
+        "sdk.iad-01.braze.com",
+        "segment.com",
+        "segment.io",
+        "track.hubspot.com",
+        "vwo.com",
+        "wzrkt.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2006,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "2o7.net",
+        "addthis.com",
+        "addtoany.com",
+        "agkn.com",
+        "b.scorecardresearch.com",
+        "bam.nr-data.net",
+        "bcp.crwdcntrl.net",
+        "beacon.krxd.net",
+        "bluekai.com",
+        "browser-intake-datadoghq.com",
+        "bugsnag.com",
+        "cdn.krxd.net",
+        "cdn.permutive.com",
+        "chartbeat.com",
+        "crwdcntrl.net",
+        "datadoghq-browser-agent.com",
+        "demdex.net",
+        "dpm.demdex.net",
+        "everesttech.net",
+        "exelator.com",
+        "id5-sync.com",
+        "idsync.rlcdn.com",
+        "intentiq.com",
+        "js-agent.newrelic.com",
+        "krxd.net",
+        "liadm.com",
+        "liveintent.com",
+        "lotame.com",
+        "neustar.biz",
+        "newrelic.com",
+        "notify.bugsnag.com",
+        "nr-data.net",
+        "omtrdc.net",
+        "parsely.com",
+        "permutive.com",
+        "ping.chartbeat.net",
+        "pippio.com",
+        "pixel.quantserve.com",
+        "pixel.tapad.com",
+        "quantcount.com",
+        "quantserve.com",
+        "rlcdn.com",
+        "s7.addthis.com",
+        "sb.scorecardresearch.com",
+        "scorecardresearch.com",
+        "secure.quantserve.com",
+        "sharethis.com",
+        "srv.pixel.parsely.com",
+        "static.chartbeat.com",
+        "tags.bluekai.com",
+        "tapad.com",
+        "uidapi.com",
+        "voicefive.com",
+        "w.sharethis.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2007,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "api.fpjs.io",
+        "cdn.sift.com",
+        "fingerprintjs.com",
+        "forther.com",
+        "fpjs.io",
+        "fpnpmcdn.net",
+        "h.online-metrix.net",
+        "iovation.com",
+        "maxmind.com",
+        "mpsnare.iesnare.com",
+        "perimeterx.net",
+        "sift.com",
+        "siftscience.com",
+        "socure.com",
+        "threatmetrix.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 2008,
+    "priority": 15,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "ping",
+        "csp_report"
+      ]
+    }
+  },
+  {
+    "id": 2009,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/google_analytics.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/analytics.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2010,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/google_analytics.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/gtag/js?",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2011,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/collect?v=1",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "image",
+        "xmlhttprequest",
+        "ping"
+      ]
+    }
+  },
+  {
+    "id": 2012,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/g/collect?v=2",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "xmlhttprequest",
+        "ping",
+        "image"
+      ]
+    }
+  },
+  {
+    "id": 2013,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/fbevents.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/fbevents.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2014,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/scevent.min.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2015,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/pixel.gif",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "image",
+        "ping"
+      ]
+    }
+  },
+  {
+    "id": 2016,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/beacon.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2017,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/fingerprint*.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2018,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/id-sync",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "image",
+        "sub_frame",
+        "xmlhttprequest",
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 2019,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/usersync",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "image",
+        "sub_frame",
+        "xmlhttprequest"
+      ]
+    }
+  },
+  {
+    "id": 2020,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/api/*/envelope/?sentry_key=",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "xmlhttprequest",
+        "ping",
+        "other"
+      ]
+    }
+  }
+]

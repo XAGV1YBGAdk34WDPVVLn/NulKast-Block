@@ -1,0 +1,99 @@
+[
+  {
+    "id": 4001,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "adblade.com",
+        "cdn.taboola.com",
+        "contentad.net",
+        "dianomi.com",
+        "images.taboola.com",
+        "jsc.mgid.com",
+        "ligatus.com",
+        "lockerdome.com",
+        "log.outbrain.com",
+        "mgid.com",
+        "nativo.com",
+        "odb.outbrain.com",
+        "outbrain.com",
+        "outbrainimg.com",
+        "plista.com",
+        "revcontent.com",
+        "servicer.mgid.com",
+        "taboola.com",
+        "trc.taboola.com",
+        "trends.revcontent.com",
+        "widgets.outbrain.com",
+        "zergnet.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 4002,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "a.optmstr.com",
+        "aimtell.com",
+        "cdn.izooto.com",
+        "cdn.onesignal.com",
+        "gravitec.net",
+        "hellobar.com",
+        "izooto.com",
+        "load.sumo.com",
+        "onesignal.com",
+        "optinmonster.com",
+        "privy.com",
+        "pushcrew.com",
+        "pushwoosh.com",
+        "sleeknote.com",
+        "subscribers.com",
+        "sumo.com",
+        "webpushr.com",
+        "widget.privy.com",
+        "wisepops.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  }
+]

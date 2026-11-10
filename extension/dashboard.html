@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AegisBlock — Blocker Research &amp; Analytics Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-primary: #090d16;
+      --bg-secondary: #111827;
+      --bg-card: #161f33;
+      --bg-input: #0d1322;
+      --border-color: #24324a;
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-blue: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-purple: #a855f7;
+
+      --blue-subtle: color-mix(in oklch, var(--accent-blue) 14%, transparent);
+      --blue-border: color-mix(in oklch, var(--accent-blue) 42%, transparent);
+      --emerald-subtle: color-mix(in oklch, var(--accent-emerald) 14%, transparent);
+      --emerald-border: color-mix(in oklch, var(--accent-emerald) 42%, transparent);
+      --amber-subtle: color-mix(in oklch, var(--accent-amber) 15%, transparent);
+      --amber-border: color-mix(in oklch, var(--accent-amber) 42%, transparent);
+      --red-subtle: color-mix(in oklch, var(--accent-red) 15%, transparent);
+      --red-border: color-mix(in oklch, var(--accent-red) 42%, transparent);
+      --focus-ring: color-mix(in oklch, var(--accent-blue) 85%, white);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Sticky Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in oklch, var(--bg-secondary) 92%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-row img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-csp {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      background: var(--emerald-subtle);
+      border: 1px solid var(--emerald-border);
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 34px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent-blue);
+      background: color-mix(in oklch, var(--bg-card) 85%, var(--accent-blue));
+    }
+
+    .btn.primary {
+      background: var(--blue-subtle);
+      color: var(--accent-blue);
+      border-color: var(--blue-border);
+    }
+
+    .btn.emerald {
+      background: var(--emerald-subtle);
+      color: #6ee7b7;
+      border-color: var(--emerald-border);
+    }
+
+    .btn.amber {
+      background: var(--amber-subtle);
+      color: #fcd34d;
+      border-color: var(--amber-border);
+    }
+
+    .btn.danger {
+      background: var(--red-subtle);
+      color: #fca5a5;
+      border-color: var(--red-border);
+    }
+
+    .kbd-hint {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 11px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 28px 0;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .tab-pill {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 99px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    /* Main Workspace */
+    .workspace {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px 28px 48px;
+    }
+
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Two-Column Panels */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Horizontal Bar Charts */
+    .bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .bar-track {
+      height: 8px;
+      background: var(--bg-input);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-input);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+    }
+
+    th {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid color-mix(in oklch, var(--border-color) 60%, transparent);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: color-mix(in oklch, var(--bg-card) 55%, transparent);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      margin-right: 4px;
+      margin-bottom: 3px;
+    }
+
+    .tag.emerald {
+      background: var(--emerald-subtle);
+      color: #6ee7b7;
+      border-color: var(--emerald-border);
+    }
+
+    .tag.blue {
+      background: var(--blue-subtle);
+      color: var(--accent-blue);
+      border-color: var(--blue-border);
+    }
+
+    .tag.amber {
+      background: var(--amber-subtle);
+      color: #fcd34d;
+      border-color: var(--amber-border);
+    }
+
+    /* Search & Filter Toolbar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      min-width: 280px;
+    }
+
+    .pill-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--blue-subtle);
+      color: var(--accent-blue);
+      border-color: var(--blue-border);
+    }
+
+    pre.code-well {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      color: #bae6fd;
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    /* Ruleset Cards */
+    .ruleset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .ruleset-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    /* Command Palette Dialog (Cmd+K / Ctrl+K) */
+    dialog#cmd-palette {
+      margin: 10vh auto;
+      width: min(580px, 92vw);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+    }
+
+    dialog#cmd-palette::backdrop {
+      background: rgba(5, 8, 15, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .cmd-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cmd-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .cmd-list {
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      text-align: left;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .cmd-item:hover,
+    .cmd-item:focus {
+      background: var(--blue-subtle);
+      color: var(--accent-blue);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 26px;
+      background: #065f46;
+      color: #ecfdf5;
+      border: 1px solid #10b981;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand-row">
+      <img src="icons/icon48.png" alt="AegisBlock" />
+      <div>
+        <div class="brand-title">
+          AegisBlock Research &amp; Telemetry Studio
+          <span class="badge-csp">🔒 100% Local • Zero Outbound Leak</span>
+        </div>
+        <div class="brand-subtitle">
+          Manifest V3 DeclarativeNetRequest Analytics, Heuristic Evasion Discovery &amp; Automated Rule Synthesizer
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn" id="btn-cmd-palette" title="Open Command Palette (Ctrl+K or Cmd+K)">
+        ⌘ Command Palette <span class="kbd-hint">Ctrl+K</span>
+      </button>
+      <button class="btn amber" id="btn-seed-demo" title="Populate realistic multi-site blocker & evasion research dataset to test analytics">
+        🧪 Load Sample Research Dataset
+      </button>
+      <button class="btn primary" id="btn-export-telemetry" title="Export full local telemetry & synthesized DNR ruleset JSON">
+        📥 Export Research JSON
+      </button>
+      <button class="btn danger" id="btn-reset-telemetry" title="Clear recorded telemetry counters and event logs">
+        🗑️ Reset Stats
+      </button>
+    </div>
+  </header>
+
+  <nav class="nav-tabs" role="tablist">
+    <button class="tab-btn active" data-tab="tab-overview" role="tab">
+      📊 Overview &amp; Blocker Analytics
+    </button>
+    <button class="tab-btn" data-tab="tab-heuristics" role="tab">
+      🔬 Heuristic Discovery &amp; Rule Lab <span class="tab-pill" id="pill-suspects">0</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-rules" role="tab">
+      🛡️ DNR Ruleset Auditor &amp; Allowlist <span class="tab-pill" id="pill-rules">48</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-stream" role="tab">
+      ⚡ Live Telemetry Stream <span class="tab-pill" id="pill-events">0</span>
+    </button>
+  </nav>
+
+  <main class="workspace">
+    <!-- ================================================================== -->
+    <!-- TAB 1: OVERVIEW & BLOCKER ANALYTICS                                -->
+    <!-- ================================================================== -->
+    <section class="tab-panel active" id="tab-overview">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Network Requests Blocked</div>
+          <div class="kpi-value" style="color: var(--accent-emerald);" id="kpi-network-blocked">0</div>
+          <div class="kpi-sub">Blocked at C++ network layer before socket/cookie</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">URL &amp; Header Sanitizations</div>
+          <div class="kpi-value" style="color: var(--accent-blue);" id="kpi-sanitized">0</div>
+          <div class="kpi-sub">utm_*, fbclid, gclid &amp; Browsing-Topics stripped</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Cosmetic &amp; Video Mitigations</div>
+          <div class="kpi-value" style="color: var(--accent-purple);" id="kpi-cosmetic">0</div>
+          <div class="kpi-sub">DOM containers collapsed &amp; pre-roll ads skipped</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Heuristic Evasions Flagged</div>
+          <div class="kpi-value" style="color: var(--accent-amber);" id="kpi-suspects">0</div>
+          <div class="kpi-sub">Unblocked 3rd-party candidates for rule synthesis</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active Protection Rules</div>
+          <div class="kpi-value" id="kpi-active-rules">48</div>
+          <div class="kpi-sub" id="kpi-covered-domains">396 domains in static + learned sets</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Estimated Bandwidth Saved</div>
+          <div class="kpi-value" style="color: var(--accent-emerald);" id="kpi-bytes-saved">0 KB</div>
+          <div class="kpi-sub">Prevented ad script, video &amp; frame payloads</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Blocker Telemetry by Protection Layer</div>
+              <div class="panel-subtitle">Distribution across DNR static rulesets, dynamic rules &amp; DOM filters</div>
+            </div>
+          </div>
+          <div class="bar-list" id="chart-layer-bars"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Blocked Network Requests by Resource Type</div>
+              <div class="panel-subtitle">Identifies whether scripts, XHR/fetch beacons, iframes, or pings dominate</div>
+            </div>
+          </div>
+          <div class="bar-list" id="chart-resource-bars"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Top Blocked Ad &amp; Tracker Domains</div>
+              <div class="panel-subtitle">Ranked by block frequency &amp; cross-site prevalence across visited sites</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Blocked Domain</th>
+                  <th>Vendor / Category</th>
+                  <th>Hits</th>
+                  <th>Cross-Site Spread</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-top-domains"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Most Tracker-Heavy First-Party Websites</div>
+              <div class="panel-subtitle">Websites initiating the highest number of blocked ad/tracker requests</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>First-Party Website</th>
+                  <th>Net Blocked</th>
+                  <th>DOM / Video</th>
+                  <th>Distinct Trackers</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-top-sites"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- TAB 2: HEURISTIC DISCOVERY & RULE SYNTHESIZER LAB                  -->
+    <!-- ================================================================== -->
+    <section class="tab-panel" id="tab-heuristics">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔬 Self-Learning Heuristic Evasion Discovery Engine</div>
+            <div class="panel-subtitle">
+              Passively analyzes unblocked third-party resources (IAB ad iframe sizes, OpenRTB/Prebid/VAST URL tokens, beacon pings &amp; cross-site prevalence) so you can promote new ad/tracker domains into DNR block rules.
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
+              <input type="checkbox" id="dash-chk-autolearn" />
+              Auto-Promote Suspects ≥85% Confidence
+            </label>
+            <button class="btn emerald" id="btn-bulk-promote">
+              ⚡ Bulk Promote All ≥80% Confidence
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Suspect Third-Party Host</th>
+                <th>Confidence</th>
+                <th>Category</th>
+                <th>Heuristic Signals</th>
+                <th>Seen On Sites</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-suspects"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">⚠️ False-Positive &amp; Page Breakage Diagnostics</div>
+            <div class="panel-subtitle">
+              Correlates blocked scripts, rapid tab reloads (3+ in 15s), missing SDK globals, and user site-pauses with the exact DNR rule that fired — allowing 1-click surgical per-site unblocking.
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Affected Site</th>
+                <th>Blocked Domain</th>
+                <th>Breakage Signal</th>
+                <th>Rule ID</th>
+                <th>Surgical Fix</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-false-positives"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🧬 Synthesized Manifest V3 `declarativeNetRequest` Ruleset Preview</div>
+            <div class="panel-subtitle">
+              Ready-to-compile Chromium/Edge DNR JSON generated from your learned dynamic rules &amp; high-confidence heuristic discoveries. Run <code>python3 cli.py ingest &lt;exported.json&gt;</code> to merge permanently into static rules.
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn" id="btn-copy-synthesized">📋 Copy DNR JSON</button>
+            <button class="btn primary" id="btn-download-synthesized">💾 Download Synthesized Rules (.json)</button>
+          </div>
+        </div>
+        <pre class="code-well" id="synthesized-json-preview">[]</pre>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- TAB 3: DNR RULESET AUDITOR, CUSTOM RULES & ALLOWLIST               -->
+    <!-- ================================================================== -->
+    <section class="tab-panel" id="tab-rules">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Static DeclarativeNetRequest Rulesets</div>
+            <div class="panel-subtitle">Toggle built-in C++ network filtering rulesets</div>
+          </div>
+        </div>
+        <div class="ruleset-grid" id="ruleset-cards"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Add Custom Domain Block Rule</div>
+              <div class="panel-subtitle">Compiled immediately into Chromium's dynamic DNR table</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input
+              type="text"
+              class="search-input"
+              id="input-custom-domain"
+              placeholder="e.g. ads.example-tracker.net"
+              style="flex: 1;"
+            />
+            <button class="btn emerald" id="btn-add-custom-domain">+ Block Domain</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Blocked Domain</th>
+                  <th>Source</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-dynamic-rules"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Allowlisted Websites &amp; Zapped Selectors</div>
+              <div class="panel-subtitle">Manage paused domains and Element Zapper cosmetic rules</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input
+              type="text"
+              class="search-input"
+              id="input-allowlist-site"
+              placeholder="Allowlist domain (e.g. trusted-site.org)"
+              style="flex: 1;"
+            />
+            <button class="btn amber" id="btn-add-allowlist">+ Allowlist Site</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Site / Domain</th>
+                  <th>Type / Details</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-allowlist-and-zapper"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">DNR Rule Effectiveness &amp; Hit-Rate Auditor</div>
+            <div class="panel-subtitle">Evaluates which rules in your catalog block the most traffic vs. zero-hit rules</div>
+          </div>
+          <input
+            type="text"
+            class="search-input"
+            id="input-rule-search"
+            placeholder="Press / to filter rules by vendor, domain, or ID..."
+          />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rule ID</th>
+                <th>Ruleset</th>
+                <th>Vendor / Rule Group</th>
+                <th>Category</th>
+                <th>Pattern Summary</th>
+                <th>Hit Count</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-rule-auditor"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- TAB 4: LIVE TELEMETRY STREAM                                       -->
+    <!-- ================================================================== -->
+    <section class="tab-panel" id="tab-stream">
+      <div class="panel">
+        <div class="filter-bar">
+          <div class="pill-group" id="stream-filter-pills">
+            <button class="filter-pill active" data-kind="ALL">All Events</button>
+            <button class="filter-pill" data-kind="BLOCKED">Blocked</button>
+            <button class="filter-pill" data-kind="SANITIZED">URL/Header Cleaned</button>
+            <button class="filter-pill" data-kind="COSMETIC">Cosmetic / Video</button>
+            <button class="filter-pill" data-kind="SUSPECT">Heuristic Suspects</button>
+            <button class="filter-pill" data-kind="FALSE_POSITIVE">False Positives</button>
+          </div>
+          <input
+            type="text"
+            class="search-input"
+            id="input-stream-search"
+            placeholder="Search events by domain, site, rule, or URL..."
+          />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Initiator Site</th>
+                <th>Target Host / Selector</th>
+                <th>Type</th>
+                <th>Rule / Sensor</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-live-stream"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Universal Command Palette (Cmd+K / Ctrl+K) -->
+  <dialog id="cmd-palette">
+    <div class="cmd-header">
+      <span>⌘</span>
+      <input
+        type="text"
+        class="cmd-input"
+        id="cmd-input"
+        placeholder="Type a command or jump to section (e.g. Bulk Promote, Export JSON, Load Sample Data)..."
+      />
+      <span class="kbd-hint">Esc</span>
+    </div>
+    <div class="cmd-list" id="cmd-list"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Action completed</div>
+  <script src="dashboard.js"></script>
+</body>
+</html>

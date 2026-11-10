@@ -1,0 +1,135 @@
+{
+  "state": {
+    "domainStats": {
+      "googlesyndication.com": {
+        "vendor": "Google Ads & DoubleClick RTB",
+        "category": "Ad Network / RTB",
+        "count": 148,
+        "initiatorSites": [
+          "news-daily.com",
+          "tech-review.io",
+          "finance-watch.org",
+          "sports-stream.tv"
+        ],
+        "resourceTypes": {
+          "script": 92,
+          "sub_frame": 56
+        }
+      },
+      "doubleclick.net": {
+        "vendor": "Google Ads & DoubleClick RTB",
+        "category": "Ad Network / RTB",
+        "count": 119,
+        "initiatorSites": [
+          "news-daily.com",
+          "sports-stream.tv",
+          "shop-deals.com"
+        ],
+        "resourceTypes": {
+          "sub_frame": 74,
+          "xmlhttprequest": 45
+        }
+      },
+      "rubiconproject.com": {
+        "vendor": "Programmatic Header Bidding & SSP Exchanges",
+        "category": "Programmatic SSP",
+        "count": 84,
+        "initiatorSites": [
+          "news-daily.com",
+          "tech-review.io",
+          "finance-watch.org"
+        ],
+        "resourceTypes": {
+          "xmlhttprequest": 68,
+          "script": 16
+        }
+      },
+      "scorecardresearch.com": {
+        "vendor": "Cross-Site Identity Graphs, DMPs & Audience Trackers",
+        "category": "Identity Graph / DMP",
+        "count": 67,
+        "initiatorSites": [
+          "news-daily.com",
+          "finance-watch.org",
+          "sports-stream.tv"
+        ],
+        "resourceTypes": {
+          "ping": 51,
+          "script": 16
+        }
+      },
+      "hotjar.com": {
+        "vendor": "Session Replay & Keystroke/Mouse Heatmap Recording",
+        "category": "Session Replay / Invasive",
+        "count": 39,
+        "initiatorSites": [
+          "saas-portal.app",
+          "shop-deals.com"
+        ],
+        "resourceTypes": {
+          "script": 29,
+          "websocket": 10
+        }
+      }
+    },
+    "suspectCandidates": {
+      "ads-telemetry.rtb-edge-delivery.net": {
+        "baseDomain": "rtb-edge-delivery.net",
+        "confidence": 94,
+        "category": "Suspect Ad Server",
+        "signals": [
+          "AD_SUBDOMAIN_PREFIX",
+          "URL_ADTECH_ENDPOINT",
+          "ADTECH_QUERY_PARAMS",
+          "CROSS_SITE_PREVALENCE"
+        ],
+        "initiatorSites": [
+          "news-daily.com",
+          "tech-review.io"
+        ],
+        "sampleUrl": "https://ads-telemetry.rtb-edge-delivery.net/openrtb2/auction?ad_unit=top_728x90"
+      },
+      "pixel-sync.audience-graph-cdn.io": {
+        "baseDomain": "audience-graph-cdn.io",
+        "confidence": 89,
+        "category": "Suspect Tracker / Beacon",
+        "signals": [
+          "TRACKER_SUBDOMAIN_PREFIX",
+          "URL_TRACKER_ENDPOINT",
+          "INITIATOR_PING",
+          "CROSS_SITE_PREVALENCE"
+        ],
+        "initiatorSites": [
+          "shop-deals.com",
+          "finance-watch.org"
+        ],
+        "sampleUrl": "https://pixel-sync.audience-graph-cdn.io/usersync/pixel.gif?uid=99182"
+      },
+      "banner.native-yield-exchange.com": {
+        "baseDomain": "native-yield-exchange.com",
+        "confidence": 86,
+        "category": "Suspect Ad Iframe",
+        "signals": [
+          "IAB_AD_IFRAME_300x250",
+          "AD_SUBDOMAIN_PREFIX",
+          "URL_ADTECH_ENDPOINT"
+        ],
+        "initiatorSites": [
+          "sports-stream.tv"
+        ],
+        "sampleUrl": "https://banner.native-yield-exchange.com/adframe.html?slot=sidebar_300x250"
+      }
+    },
+    "falsePositiveReports": {
+      "saas-portal.app::script.hotjar.com": {
+        "site": "saas-portal.app",
+        "blockedDomain": "script.hotjar.com",
+        "ruleId": 2004,
+        "reason": "SCRIPT_LOAD_BLOCKED",
+        "detail": "Blocked third-party script on saas-portal.app (Rule #2004)",
+        "count": 1,
+        "mitigated": false
+      }
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "manifest_version": 3,
+  "name": "AegisBlock — Zero-Leak AdBlocker & Telemetry Lab",
+  "short_name": "AegisBlock",
+  "version": "1.0.0",
+  "description": "Fast, zero-leak Manifest V3 AdBlocker for Microsoft Edge with native C++ DNR blocking, URL tracker sanitization, cosmetic element zapper, and local-only blocker research & rule synthesis analytics.",
+  "minimum_chrome_version": "120",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "AegisBlock — Zero-Leak AdBlocker & Telemetry Lab",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "dashboard.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback",
+    "storage",
+    "scripting",
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ads_core",
+        "enabled": true,
+        "path": "rules/ads_core.json"
+      },
+      {
+        "id": "trackers_privacy",
+        "enabled": true,
+        "path": "rules/trackers_privacy.json"
+      },
+      {
+        "id": "url_privacy_clean",
+        "enabled": true,
+        "path": "rules/url_privacy_clean.json"
+      },
+      {
+        "id": "annoyances_social",
+        "enabled": true,
+        "path": "rules/annoyances_social.json"
+      }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "commands": {
+    "toggle-element-zapper": {
+      "suggested_key": {
+        "default": "Alt+Shift+Z"
+      },
+      "description": "Launch interactive Element Zapper on the active page"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "surrogates/googletag_gpt.js",
+        "surrogates/google_ima3.js",
+        "surrogates/adsbygoogle.js",
+        "surrogates/google_analytics.js",
+        "surrogates/fbevents.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';"
+  }
+}
