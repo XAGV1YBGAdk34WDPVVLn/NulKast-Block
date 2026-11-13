@@ -6,6 +6,7 @@ Backed by SQLite WAL (`data/adblock_research.db`).
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sqlite3
@@ -24,7 +25,20 @@ EXT_DIR = ROOT_DIR / "extension"
 RULES_DIR = EXT_DIR / "rules"
 DATA_DIR = ROOT_DIR / "data"
 DB_PATH = DATA_DIR / "adblock_research.db"
-WINDOWS_EXT_DIR = Path("/mnt/c/Users/oz_co/code/extensions/adblocker")
+
+
+def _resolve_windows_ext_dir() -> Path:
+    env_dir = os.environ.get("AEGISBLOCK_WIN_DIR")
+    if env_dir:
+        return Path(env_dir)
+    users_root = Path("/mnt/c/Users")
+    if users_root.exists():
+        for candidate in sorted(users_root.glob("*/code/extensions/adblocker")):
+            return candidate
+    return ROOT_DIR / "dist" / "unpacked"
+
+
+WINDOWS_EXT_DIR = _resolve_windows_ext_dir()
 
 
 def get_db() -> sqlite3.Connection:
@@ -166,7 +180,7 @@ def cmd_sync(_args):
         else:
             shutil.copy2(item, dest)
     print(f"[AegisBlock Sync] Synced unpacked extension to {WINDOWS_EXT_DIR}")
-    print(r"  -> Load in Microsoft Edge (`edge://extensions`): C:\Users\oz_co\code\extensions\adblocker")
+    print("  -> Load unpacked in Microsoft Edge (`edge://extensions`) from the synced directory.")
 
 
 def cmd_ingest(args):
@@ -616,7 +630,7 @@ def main():
     sub = parser.add_subparsers(dest="cmd")
 
     sub.add_parser("build", help="Compile static DNR rulesets, icons, and SQLite learned rules")
-    sub.add_parser("sync", help="Sync extension to C:\\Users\\oz_co\\code\\extensions\\adblocker")
+    sub.add_parser("sync", help="Sync unpacked extension to target Windows/local directory")
     sub.add_parser("validate", help="Run 6-Gate Pre-Flight QA Validator")
     sub.add_parser("test", help="Run the automated Python + Node.js MV3 test suite")
     sub.add_parser("stats", help="Display Blocker Research & Telemetry Summary")

@@ -1,69 +1,105 @@
-# 🛡️ AegisBlock — Zero-Leak Microsoft Edge MV3 AdBlocker & Telemetry Lab
+# 🛡️ AegisBlock — Zero-Leak Manifest V3 AdBlocker & Telemetry Lab
 
-A fast, zero-leak **Manifest V3** ad and tracker blocker for **Microsoft Edge** with a built-in **Blocker Telemetry, Heuristic Evasion Sensor, and Automated DNR Rule Synthesizer**.
-
----
-
-## 🔒 Security & Zero-Leak Guarantees
-
-1. **Browser-Enforced Zero-Outbound-Network CSP**:
-   - [`extension/manifest.json`](extension/manifest.json) enforces `"content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';" }`.
-   - The extension **cannot** make outbound `fetch()`, `XMLHttpRequest`, `WebSocket`, or `sendBeacon` calls to any external server.
-2. **100% Local Storage (`chrome.storage.local` + SQLite WAL)**:
-   - Never uses `chrome.storage.sync` (so your browsing/blocking stats are never uploaded to cloud sync servers).
-3. **C++ Network-Layer Blocking (`declarativeNetRequest`)**:
-   - Blocks ad networks, RTB auctions, session-replay scripts, and third-party `<a ping>` / `csp_report` beacons before any TCP/TLS socket or cookie header is transmitted.
-   - Strips **48+ tracking query parameters** (`utm_*`, `fbclid`, `gclid`, `msclkid`, `twclid`, `ttclid`, `mc_eid`, `igshid`, `_ga`, `_gl`) and removes `Sec-Browsing-Topics`, `X-Client-Data`, `NEL`, and `Report-To` headers inline.
+**AegisBlock** is a fast, zero-bloat **Manifest V3** ad, tracker, and anti-adblock wall blocker for **Microsoft Edge** (and Chromium browsers) paired with a **100% local Blocker Telemetry, Heuristic Evasion Sensor, False-Positive Breakage Correlator, C++ Surrogate Redirector, and Automated DNR Rule Synthesizer**.
 
 ---
 
-## 🔬 Blocker Research, Telemetry & Self-Learning Rule Lab
+## ✨ Key Capabilities
 
-AegisBlock collects **100% local telemetry** on both **blocked requests** and **unblocked suspect third-party resources** so you can analyze blocker performance and automatically synthesize stronger rules:
+### 1. Native C++ Network-Layer Blocking (`declarativeNetRequest`)
+- **4 Modular Static Rulesets (57 Rules / 410+ Ad & Tracker Domains)**:
+  - `ads_core.json`: Blocks programmatic RTB exchanges, DoubleClick/AdSense, Amazon AAX, Xandr/AppNexus, Criteo, VAST/VPAID video ad servers, and popunder networks before any TCP/TLS connection or cookie header is sent.
+  - `trackers_privacy.json`: Blocks behavioral analytics, session-replay/keystroke recorders (`hotjar`, `fullstory`, `clarity.ms`, `mouseflow`, `logrocket`), device fingerprinting scripts, Adobe DTM (`adobedtm.com`), and all third-party `<a ping>` / `csp_report` beacons while surgically sparing dual-use functional widgets.
+  - `url_privacy_clean.json`: Uses Chromium's native C++ `queryTransform.removeParams` to strip **53 tracking & attribution query parameters** (`utm_*`, `fbclid`, `gclid`, `srsltid`, `irclickid`, `cjevent`, `epik`, `rdt_cid`, `sccid`, `msclkid`, `twclid`, `ttclid`, `mc_eid`, `igshid`, `_ga`, `_gl`, etc.) and strips `Sec-Browsing-Topics`, `Sec-Ad-Auction-Fetch`, `X-Client-Data`, `NEL`, and `Report-To` headers inline.
+  - `annoyances_social.json`: Blocks native recommendation chumboxes (`taboola`, `outbrain`, `revcontent`, `mgid`), web-push notification nags, and **Anti-Adblock / Visitor Recovery walls** (`getadmiral.com`, `chalkdream.com`, `succeedscene.com`, `fundingchoicesmessages.google.com`, `blockthrough.com`, `pagefair.com`, `adrecover.com`).
 
-- **Real-Time DNR Match Telemetry (`onRuleMatchedDebug`)**:
-  - Tracks rule hit counts, blocked domains, resource types (`script`, `xmlhttprequest`, `sub_frame`, `ping`, `image`, `media`), cross-site tracker spread, and most tracker-heavy first-party websites.
-- **Heuristic Evasion Sensor (`content.js`)**:
-  - Passively inspects unblocked third-party resources using `PerformanceObserver` and DOM iframe scanning (checking standard IAB ad sizes like `300x250`/`728x90`, OpenRTB/Prebid/VAST URL tokens, beacon initiators, and cross-site prevalence).
-  - Calculates an explainable **Confidence Score (`0–99%`)** with signal tags (`IAB_AD_IFRAME_300x250`, `AD_SUBDOMAIN_PREFIX`, `URL_ADTECH_ENDPOINT`, `CROSS_SITE_PREVALENCE`).
-- **1-Click & Auto-Learn Rule Promotion**:
-  - Promote any discovered evasion candidate directly into Chromium's dynamic `declarativeNetRequest` engine from the Popup or the full-page **Research & Analytics Studio (`dashboard.html`)**, or export a telemetry snapshot to compile permanently into the static ruleset via `python3 cli.py ingest`.
+### 2. Zero-Latency Local C++ Surrogate Shims (`extension/surrogates/*.js`)
+Redirects blocked ad/analytics/anti-adblock SDK script requests to local, inert JavaScript shims at priority `30` so publisher pages and video players never hang or throw `ReferenceError`s:
+- `googletag_gpt.js` — Google Publisher Tags (`gpt.js` / `pubads_impl.js`) mock with synthetic `slotRenderEnded` completion events.
+- `google_ima3.js` — Google IMA3 Video SDK (`ima3.js`) shim that immediately fires `ALL_ADS_COMPLETED` and `CONTENT_RESUME_REQUESTED`.
+- `adsbygoogle.js` — AdSense (`adsbygoogle.js`) stub marking slots as done.
+- `google_analytics.js` — `analytics.js` / `gtag/js` stub that immediately invokes `hitCallback` so link navigation never stalls.
+- `fbevents.js` — Meta Pixel (`fbevents.js`) no-op shim.
+- `anti_adblock_noop.js` — Disarms Admiral (`window.admiral`), Google Funding Choices (`window.googlefc`), and `BlockAdBlock` / `FuckAdBlock`.
+
+### 3. `MAIN`-World Anti-Adblock & Scroll-Lock Defuser (`page_defuser.js` + `content.js`)
+- Runs at `document_start` in the page's `MAIN` JavaScript world to trap `window.admiral`, `window.BlockAdBlock`, `window.FuckAdBlock`, `window.canRunAds = true`, and `window.isAdBlockActive = false` before inline or tag-manager scripts can initialize them.
+- Intercepts dynamic `<script>` injection (`appendChild` / `insertBefore`) matching Admiral or anti-adblock bootstrapper patterns.
+- Automatically removes injected `"Powered by Admiral"` or anti-adblock modal overlays and unlocks `overflow: hidden` / `position: fixed` scroll-locks on `<html>` and `<body>`.
+
+### 4. Passive False-Positive & Leak Detection + Self-Learning Rule Lab
+- **False-Positive & Breakage Sensor**: Detects blocked script load errors, missing SDK globals, rapid tab reloads (frustration signal), and site pauses, correlates them with the exact DNR rule ID that fired in that tab, and offers **1-click surgical per-site domain exceptions** (priority `6000`).
+- **Heuristic Evasion & First-Party Ad Cloaking Sensor**: Passively scores unblocked third-party resources and first-party cloaked ad paths (`/adserver/`, `/openrtb2/`, `/prebid`, `/vast`) and promotes high-confidence suspects into dynamic or static DNR rules.
+- **Interactive Shadow-DOM Element Zapper (`Alt+Shift+Z`)**: Point-and-click visual element blocker isolated inside a closed Shadow DOM root.
+
+### 5. Strict Zero-Outbound-Network Guarantee
+- `extension/manifest.json` enforces `"content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';" }`.
+- Uses `chrome.storage.local` exclusively (never `chrome.storage.sync`). Zero telemetry ever leaves your machine.
 
 ---
 
-## 🚀 Loading in Microsoft Edge
+## 🚀 Quick Start (Microsoft Edge / Chromium)
 
-1. Run `make` (or `python3 cli.py sync`) to sync the unpacked extension to Windows:
-   - **Windows Path**: `C:\Users\oz_co\code\extensions\adblocker`
-   - **WSL Path**: `/mnt/c/Users/oz_co/code/extensions/adblocker`
-2. Open Microsoft Edge and navigate to `edge://extensions`.
-3. Enable **Developer mode** (toggle in the left sidebar).
-4. Click **Load unpacked** and select:
-   ```text
-   C:\Users\oz_co\code\extensions\adblocker
-   ```
-5. Click the **AegisBlock** shield icon in the toolbar to toggle protection per site, launch the **Element Zapper (`Alt+Shift+Z`)**, or open the **Analytics & Rule Lab**.
+### 1. Build & Validate Rulesets
+Requires Python 3.10+ (standard library only) and Node.js (for syntax/runtime tests):
+```bash
+make
+```
+
+### 2. Load Unpacked Extension in Microsoft Edge
+1. Open Microsoft Edge and navigate to `edge://extensions`.
+2. Enable **Developer mode** in the left sidebar.
+3. Click **Load unpacked** and select the `extension/` folder (or your synced unpacked directory).
+4. Click the **AegisBlock** shield icon in the toolbar to view live blocked/surrogate/false-positive counters, launch the **Element Zapper (`Alt+Shift+Z`)**, or open the full-page **Research & Analytics Studio**.
 
 ---
 
-## 🛠️ CLI Commands (`cli.py`)
+## 🛠️ CLI Reference (`cli.py`)
 
 ```bash
-# Compile static DNR rulesets, rule catalog, and SQLite learned rules
+# Compile static DNR rulesets, rule catalog, icons, and SQLite learned rules
 python3 cli.py build
 
-# Seed representative multi-site research telemetry & auto-synthesize rules
+# Seed benchmark multi-site telemetry into SQLite and synthesize rules
 python3 cli.py simulate-research
 
-# View blocker telemetry & rule coverage stats in the terminal
+# View blocker telemetry, surrogate counts, and heuristic candidates
 python3 cli.py stats
 
-# Ingest an exported telemetry JSON snapshot from the browser Research Studio
+# Ingest an exported browser telemetry JSON snapshot and auto-synthesize rules (>=80% confidence)
 python3 cli.py ingest path/to/aegisblock-telemetry.json --auto-synthesize --min-confidence 80
 
-# Sync unpacked extension to C:\Users\oz_co\code\extensions\adblocker
+# Sync unpacked extension to target directory (or set AEGISBLOCK_WIN_DIR=/path/to/dir)
 python3 cli.py sync
 
-# Run the 6-Gate Pre-Flight QA Validator
+# Run the deterministic 6-Gate Pre-Flight QA Validator
 python3 cli.py validate
+
+# Run the automated Python + Node.js MV3 test suite
+make test
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+adblocker/
+├── cli.py                           # Research DB, DNR rule synthesizer & 6-Gate QA CLI
+├── Makefile                         # Build, sync, validate, and test targets
+├── scripts/
+│   └── build_rules.py               # Static DNR ruleset compiler, Chromium urlFilter validator & PNG generator
+├── extension/                       # Complete Manifest V3 unpacked browser extension
+│   ├── manifest.json                # MV3 configuration with strict connect-src 'self' CSP
+│   ├── background.js                # Event-driven Service Worker (DNR telemetry, false-positive correlator)
+│   ├── page_defuser.js              # MAIN-world document_start anti-adblock & Admiral defuser
+│   ├── content.js                   # Cosmetic filter, modal killer, scroll unlocker, heuristic sensor & Zapper
+│   ├── content.css                  # Pre-paint ad hiding & scroll-unlock stylesheet
+│   ├── popup.html / popup.js        # Toolbar control deck
+│   ├── dashboard.html / dashboard.js# Full-page Research & Analytics Studio
+│   ├── surrogates/                  # Local zero-latency C++ DNR redirect shims
+│   ├── rules/                       # Compiled static DNR JSON rulesets & rule_catalog.json
+│   └── icons/                       # Generated RGBA PNG shield icons (16, 32, 48, 128)
+└── tests/
+    └── test_adblocker.py            # Automated unit + Node.js MV3 Service Worker simulation suite
 ```

@@ -369,8 +369,8 @@ class TestAegisBlockExtension(unittest.TestCase):
             validate_chromium_dnr_rule(dyn_rule, "dynamic_rules")
 
     def test_06_windows_unpacked_extension_sync_parity(self):
-        """Verifies that C:\\Users\\oz_co\\code\\extensions\\adblocker matches extension/ byte-for-byte."""
-        win_dir = Path("/mnt/c/Users/oz_co/code/extensions/adblocker")
+        """Verifies that the synced unpacked extension directory matches extension/ byte-for-byte."""
+        win_dir = cli.WINDOWS_EXT_DIR
         self.assertTrue(win_dir.exists())
         for rel in (
             "manifest.json",
