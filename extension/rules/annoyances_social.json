@@ -95,5 +95,127 @@
         "other"
       ]
     }
+  },
+  {
+    "id": 4003,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "abp.detect.com",
+        "adrecover.com",
+        "antiblock.org",
+        "blockthrough.com",
+        "chalkdream.com",
+        "delivery.adrecover.com",
+        "fundingchoicesmessages.google.com",
+        "getadmiral.com",
+        "pagefair.com",
+        "pagefair.net",
+        "script.ac",
+        "succeedscene.com"
+      ],
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 4004,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/anti_adblock_noop.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "RCe0c7c73598674c2288fae1d365c8dd9d",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 4005,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/anti_adblock_noop.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/admiral*.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 4006,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/anti_adblock_noop.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/fuckadblock",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 4007,
+    "priority": 30,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/surrogates/anti_adblock_noop.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "/blockadblock",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
+  },
+  {
+    "id": 4008,
+    "priority": 15,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "/load-rottentomatoes-web.js",
+      "domainType": "thirdParty",
+      "resourceTypes": [
+        "script"
+      ]
+    }
   }
 ]

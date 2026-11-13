@@ -135,6 +135,9 @@ def build_ads_core_rules():
                 "rhythmone.com",
                 "synacor.com",
                 "undertone.com",
+                "mps.vsnt.net",
+                "app.mps.vsnt.net",
+                "mps.nbcuni.com",
             ],
         ),
         (
@@ -524,6 +527,8 @@ def build_trackers_privacy_rules():
                 "dpm.demdex.net",
                 "omtrdc.net",
                 "2o7.net",
+                "adobedtm.com",
+                "assets.adobedtm.com",
                 "everesttech.net",
                 "rlcdn.com",
                 "idsync.rlcdn.com",
@@ -888,6 +893,24 @@ def build_annoyances_social_rules():
                 "hellobar.com",
             ],
         ),
+        (
+            "Anti-Adblock & Visitor Recovery Walls (Admiral, Funding Choices, Blockthrough)",
+            "Anti-Adblock Wall",
+            [
+                "getadmiral.com",
+                "chalkdream.com",
+                "succeedscene.com",
+                "fundingchoicesmessages.google.com",
+                "blockthrough.com",
+                "pagefair.com",
+                "pagefair.net",
+                "adrecover.com",
+                "delivery.adrecover.com",
+                "script.ac",
+                "antiblock.org",
+                "abp.detect.com",
+            ],
+        ),
     ]
 
     for vendor, category, domains in annoyance_clusters:
@@ -911,6 +934,78 @@ def build_annoyances_social_rules():
             "category": category,
             "description": f"Blocks {len(clean_domains)} domains in {vendor}",
             "patternSummary": f"{clean_domains[0]} (+{len(clean_domains) - 1} more)",
+        }
+        rule_id += 1
+
+    # Priority-30 Surrogate Redirects & URL Filter blocks for Admiral / Adobe Launch / Funding Choices anti-adblock scripts
+    annoyance_patterns = [
+        (
+            "RCe0c7c73598674c2288fae1d365c8dd9d",
+            "Rotten Tomatoes Adobe DTM Admiral Bootstrapper (Surrogate)",
+            "Anti-Adblock Surrogate",
+            ["script"],
+            "/surrogates/anti_adblock_noop.js",
+        ),
+        (
+            "/admiral*.js",
+            "Admiral Visitor Recovery Script (Surrogate)",
+            "Anti-Adblock Surrogate",
+            ["script"],
+            "/surrogates/anti_adblock_noop.js",
+        ),
+        (
+            "/fuckadblock",
+            "FuckAdBlock Detector Script (Surrogate)",
+            "Anti-Adblock Surrogate",
+            ["script"],
+            "/surrogates/anti_adblock_noop.js",
+        ),
+        (
+            "/blockadblock",
+            "BlockAdBlock Detector Script (Surrogate)",
+            "Anti-Adblock Surrogate",
+            ["script"],
+            "/surrogates/anti_adblock_noop.js",
+        ),
+        (
+            "/load-rottentomatoes-web.js",
+            "NBCUniversal / Versant MPS Ad Loader",
+            "Ad Server",
+            ["script"],
+            None,
+        ),
+    ]
+
+    for url_filter, vendor, category, res_types, surrogate_path in annoyance_patterns:
+        action = (
+            {"type": "redirect", "redirect": {"extensionPath": surrogate_path}}
+            if surrogate_path
+            else {"type": "block"}
+        )
+        rules.append(
+            {
+                "id": rule_id,
+                "priority": 30 if surrogate_path else 15,
+                "action": action,
+                "condition": {
+                    "urlFilter": url_filter,
+                    "domainType": "thirdParty",
+                    "resourceTypes": res_types,
+                },
+            }
+        )
+        catalog[str(rule_id)] = {
+            "id": rule_id,
+            "ruleset": "annoyances_social",
+            "vendor": vendor,
+            "category": category,
+            "surrogate": surrogate_path,
+            "description": (
+                f"Redirects {vendor} ({url_filter}) to inert local surrogate {surrogate_path}"
+                if surrogate_path
+                else f"Blocks {vendor} ({url_filter})"
+            ),
+            "patternSummary": f"{url_filter} -> {surrogate_path}" if surrogate_path else url_filter,
         }
         rule_id += 1
 

@@ -352,30 +352,120 @@
       }
     }
 
-    // 2. Check for anti-adblock modal walls so background can flag false-positive breakage
-    if (!antiAdblockWallReported) {
-      const modals = document.querySelectorAll(
-        '[id*="adblock" i], [class*="adblock" i], [role="dialog"], [aria-modal="true"]'
-      );
-      for (const modal of modals) {
-        const txt = (modal.textContent || "").slice(0, 500);
-        if (
-          /disable your ad\s*blocker|ad\s*blocker detected|whitelist (this site|us)|turn off your ad\s*blocker/i.test(
-            txt
-          )
-        ) {
-          const rect = modal.getBoundingClientRect();
-          if (rect.width >= 200 && rect.height >= 80) {
-            antiAdblockWallReported = true;
-            chrome.runtime.sendMessage({
-              type: "REPORT_BREAKAGE_DIAGNOSTIC",
-              site: CURRENT_HOST,
-              reason: "ANTI_ADBLOCK_WALL_DETECTED",
-              detail: synthesizeCssSelector(modal) || "adblock-modal"
-            }).catch(() => {});
-            break;
-          }
+    // 2. Detect & Actively Strip Anti-Adblock Walls (Admiral "Powered by Admiral", Funding Choices, etc.) + Unlock Scroll
+    neutralizeAntiAdblockWallsAndUnlockScroll();
+  }
+
+  function unlockPageScroll() {
+    for (const rootEl of [document.documentElement, document.body]) {
+      if (!rootEl) continue;
+      rootEl.setAttribute("data-aegis-scroll-unlocked", "true");
+      rootEl.style.setProperty("overflow", "auto", "important");
+      rootEl.style.setProperty("overflow-y", "auto", "important");
+      rootEl.style.setProperty("position", "static", "important");
+      rootEl.style.setProperty("pointer-events", "auto", "important");
+      rootEl.classList.remove("fc-ab-root", "modal-open", "no-scroll", "noscroll", "overflow-hidden");
+    }
+  }
+
+  function findTopModalBackdrop(node) {
+    let curr = node;
+    let bestCandidate = node;
+    while (curr && curr !== document.body && curr !== document.documentElement) {
+      const tag = (curr.tagName || "").toLowerCase();
+      if (tag === "overlay-base" || curr.classList?.contains("fc-ab-root") || curr.classList?.contains("fc-whitelist-root")) {
+        return curr;
+      }
+      try {
+        const st = window.getComputedStyle(curr);
+        const z = parseInt(st.zIndex, 10);
+        if (st.position === "fixed" || (Number.isFinite(z) && z >= 999)) {
+          bestCandidate = curr;
         }
+      } catch (_) {}
+      if (curr.parentElement === document.body) {
+        try {
+          const st = window.getComputedStyle(curr);
+          if (st.position === "fixed" || st.position === "absolute" || parseInt(st.zIndex, 10) >= 100) {
+            bestCandidate = curr;
+          }
+        } catch (_) {}
+        break;
+      }
+      curr = curr.parentElement;
+    }
+    return bestCandidate;
+  }
+
+  function neutralizeAntiAdblockWallsAndUnlockScroll() {
+    if (isSitePaused || !document.body) return;
+
+    // A. Fast selector match for known Admiral / Funding Choices / anti-adblock containers
+    const knownWallNodes = document.querySelectorAll(
+      '.fc-ab-root, .fc-whitelist-root, .fc-dialog-overlay, [class^="admiral-"], [id^="admiral-"], [class*="fEy1Z2XT"], a[href*="getadmiral.com"], img[src*="getadmiral.com"]'
+    );
+    let wallNeutralized = false;
+    let wallDetail = "";
+
+    for (const node of knownWallNodes) {
+      const modalRoot = findTopModalBackdrop(node);
+      if (modalRoot && modalRoot !== document.body && modalRoot !== document.documentElement) {
+        wallDetail = synthesizeCssSelector(modalRoot) || "admiral-or-fc-modal";
+        modalRoot.setAttribute("data-aegis-hidden", "true");
+        modalRoot.style.setProperty("display", "none", "important");
+        try {
+          modalRoot.remove();
+        } catch (_) {}
+        wallNeutralized = true;
+      }
+    }
+
+    // B. Text & Fixed-Overlay heuristic scan for dynamically obfuscated Admiral / anti-adblock modals
+    const candidateModals = document.querySelectorAll(
+      '[id*="adblock" i], [class*="adblock" i], [role="dialog"], [aria-modal="true"], body > div, overlay-base'
+    );
+    for (const el of candidateModals) {
+      if (!el || el === zapperHost || el.hasAttribute("data-aegis-hidden")) continue;
+      const txt = (el.textContent || "").slice(0, 900);
+      if (!txt) continue;
+
+      const isAdmiralOrWallText =
+        /powered by admiral|getadmiral\.com|disable your ad\s*blocker|ad\s*blocker detected|whitelist (this site|us)|turn off your ad\s*blocker|allow ads on|continue without disabling/i.test(
+          txt
+        );
+      if (!isAdmiralOrWallText) continue;
+
+      const rect = el.getBoundingClientRect();
+      let isOverlay = rect.width >= 200 && rect.height >= 80;
+      try {
+        const st = window.getComputedStyle(el);
+        if (st.position === "fixed" || parseInt(st.zIndex, 10) >= 100) {
+          isOverlay = true;
+        }
+      } catch (_) {}
+
+      if (isOverlay) {
+        const modalRoot = findTopModalBackdrop(el);
+        wallDetail = synthesizeCssSelector(modalRoot) || "anti-adblock-modal";
+        modalRoot.setAttribute("data-aegis-hidden", "true");
+        modalRoot.style.setProperty("display", "none", "important");
+        try {
+          modalRoot.remove();
+        } catch (_) {}
+        wallNeutralized = true;
+      }
+    }
+
+    if (wallNeutralized) {
+      unlockPageScroll();
+      if (!antiAdblockWallReported) {
+        antiAdblockWallReported = true;
+        chrome.runtime.sendMessage({
+          type: "REPORT_BREAKAGE_DIAGNOSTIC",
+          site: CURRENT_HOST,
+          reason: "ANTI_ADBLOCK_WALL_NEUTRALIZED",
+          detail: wallDetail
+        }).catch(() => {});
       }
     }
   }

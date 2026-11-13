@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
   "summary": {
-    "totalStaticRules": 51,
-    "totalCoveredDomains": 393,
+    "totalStaticRules": 57,
+    "totalCoveredDomains": 410,
     "rulesets": {
       "ads_core": 27,
       "trackers_privacy": 20,
       "url_privacy_clean": 2,
-      "annoyances_social": 2
+      "annoyances_social": 8
     }
   },
   "rules": {
@@ -40,8 +40,8 @@
       "ruleset": "ads_core",
       "vendor": "Programmatic Header Bidding & SSP Exchanges",
       "category": "Programmatic SSP",
-      "description": "Blocks 39 domains in Programmatic Header Bidding & SSP Exchanges",
-      "patternSummary": "33across.com (+38 more)"
+      "description": "Blocks 42 domains in Programmatic Header Bidding & SSP Exchanges",
+      "patternSummary": "33across.com (+41 more)"
     },
     "1005": {
       "id": 1005,
@@ -281,8 +281,8 @@
       "ruleset": "trackers_privacy",
       "vendor": "Cross-Site Identity Graphs, DMPs & Audience Trackers",
       "category": "Identity Graph / DMP",
-      "description": "Blocks 54 third-party tracking domains in Cross-Site Identity Graphs, DMPs & Audience Trackers",
-      "patternSummary": "2o7.net (+53 more)"
+      "description": "Blocks 56 third-party tracking domains in Cross-Site Identity Graphs, DMPs & Audience Trackers",
+      "patternSummary": "2o7.net (+55 more)"
     },
     "2007": {
       "id": 2007,
@@ -440,6 +440,59 @@
       "description": "Blocks 19 domains in Web Push Notification & Marketing Popups",
       "patternSummary": "a.optmstr.com (+18 more)"
     },
+    "4003": {
+      "id": 4003,
+      "ruleset": "annoyances_social",
+      "vendor": "Anti-Adblock & Visitor Recovery Walls (Admiral, Funding Choices, Blockthrough)",
+      "category": "Anti-Adblock Wall",
+      "description": "Blocks 12 domains in Anti-Adblock & Visitor Recovery Walls (Admiral, Funding Choices, Blockthrough)",
+      "patternSummary": "abp.detect.com (+11 more)"
+    },
+    "4004": {
+      "id": 4004,
+      "ruleset": "annoyances_social",
+      "vendor": "Rotten Tomatoes Adobe DTM Admiral Bootstrapper (Surrogate)",
+      "category": "Anti-Adblock Surrogate",
+      "surrogate": "/surrogates/anti_adblock_noop.js",
+      "description": "Redirects Rotten Tomatoes Adobe DTM Admiral Bootstrapper (Surrogate) (RCe0c7c73598674c2288fae1d365c8dd9d) to inert local surrogate /surrogates/anti_adblock_noop.js",
+      "patternSummary": "RCe0c7c73598674c2288fae1d365c8dd9d -> /surrogates/anti_adblock_noop.js"
+    },
+    "4005": {
+      "id": 4005,
+      "ruleset": "annoyances_social",
+      "vendor": "Admiral Visitor Recovery Script (Surrogate)",
+      "category": "Anti-Adblock Surrogate",
+      "surrogate": "/surrogates/anti_adblock_noop.js",
+      "description": "Redirects Admiral Visitor Recovery Script (Surrogate) (/admiral*.js) to inert local surrogate /surrogates/anti_adblock_noop.js",
+      "patternSummary": "/admiral*.js -> /surrogates/anti_adblock_noop.js"
+    },
+    "4006": {
+      "id": 4006,
+      "ruleset": "annoyances_social",
+      "vendor": "FuckAdBlock Detector Script (Surrogate)",
+      "category": "Anti-Adblock Surrogate",
+      "surrogate": "/surrogates/anti_adblock_noop.js",
+      "description": "Redirects FuckAdBlock Detector Script (Surrogate) (/fuckadblock) to inert local surrogate /surrogates/anti_adblock_noop.js",
+      "patternSummary": "/fuckadblock -> /surrogates/anti_adblock_noop.js"
+    },
+    "4007": {
+      "id": 4007,
+      "ruleset": "annoyances_social",
+      "vendor": "BlockAdBlock Detector Script (Surrogate)",
+      "category": "Anti-Adblock Surrogate",
+      "surrogate": "/surrogates/anti_adblock_noop.js",
+      "description": "Redirects BlockAdBlock Detector Script (Surrogate) (/blockadblock) to inert local surrogate /surrogates/anti_adblock_noop.js",
+      "patternSummary": "/blockadblock -> /surrogates/anti_adblock_noop.js"
+    },
+    "4008": {
+      "id": 4008,
+      "ruleset": "annoyances_social",
+      "vendor": "NBCUniversal / Versant MPS Ad Loader",
+      "category": "Ad Server",
+      "surrogate": null,
+      "description": "Blocks NBCUniversal / Versant MPS Ad Loader (/load-rottentomatoes-web.js)",
+      "patternSummary": "/load-rottentomatoes-web.js"
+    },
     "1900": {
       "id": 1900,
       "ruleset": "ads_core",
@@ -458,6 +511,7 @@
     "a.teads.tv",
     "aan.amazon.com",
     "aax.amazon-adsystem.com",
+    "abp.detect.com",
     "abtasty.com",
     "acdn.adnxs.com",
     "ad-maven.com",
@@ -475,6 +529,8 @@
     "adnexus.net",
     "adnxs-simple.com",
     "adnxs.com",
+    "adobedtm.com",
+    "adrecover.com",
     "adroll.com",
     "ads-twitter.com",
     "ads.msn.com",
@@ -498,15 +554,18 @@
     "analytics.tiktok.com",
     "analytics.twitter.com",
     "aniview.com",
+    "antiblock.org",
     "api.amplitude.com",
     "api.fpjs.io",
     "api.mixpanel.com",
     "api.segment.io",
     "app-measurement.com",
+    "app.mps.vsnt.net",
     "app.posthog.com",
     "appboy.com",
     "applovin.com",
     "applvn.com",
+    "assets.adobedtm.com",
     "assoc-amazon.com",
     "atdmt.com",
     "audience-graph-cdn.io",
@@ -521,6 +580,7 @@
     "bidpush.com",
     "bidswitch.net",
     "bidvertiser.com",
+    "blockthrough.com",
     "bluekai.com",
     "bodis.com",
     "braze.com",
@@ -550,6 +610,7 @@
     "cdn.sift.com",
     "cdn.taboola.com",
     "cedato.com",
+    "chalkdream.com",
     "chartbeat.com",
     "chartboost.com",
     "chitika.net",
@@ -575,6 +636,7 @@
     "datadoghq-browser-agent.com",
     "dc.ads.linkedin.com",
     "decibelinsight.net",
+    "delivery.adrecover.com",
     "demdex.net",
     "dev.visualwebsiteoptimizer.com",
     "dianomi.com",
@@ -603,11 +665,13 @@
     "fpnpmcdn.net",
     "freewheel.tv",
     "fullstory.com",
+    "fundingchoicesmessages.google.com",
     "fw.adsafeprotected.com",
     "fwmrm.net",
     "fyber.com",
     "galaksion.com",
     "geoedge.be",
+    "getadmiral.com",
     "glassboxdigital.io",
     "google-analytics.com",
     "googleadservices.com",
@@ -686,6 +750,8 @@
     "moatads.com",
     "mopub.com",
     "mouseflow.com",
+    "mps.nbcuni.com",
+    "mps.vsnt.net",
     "mpsnare.iesnare.com",
     "munchkin.marketo.net",
     "native-yield-exchange.com",
@@ -705,6 +771,8 @@
     "outbrain.com",
     "outbrainimg.com",
     "pagead2.googlesyndication.com",
+    "pagefair.com",
+    "pagefair.net",
     "pardot.com",
     "parkingcrew.net",
     "parsely.com",
@@ -756,6 +824,7 @@
     "s7.addthis.com",
     "sb.scorecardresearch.com",
     "scorecardresearch.com",
+    "script.ac",
     "script.crazyegg.com",
     "script.hotjar.com",
     "sdk.iad-01.braze.com",
@@ -791,6 +860,7 @@
     "static.hotjar.com",
     "steelhousemedia.com",
     "subscribers.com",
+    "succeedscene.com",
     "sumo.com",
     "synacor.com",
     "taboola.com",

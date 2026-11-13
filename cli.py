@@ -469,6 +469,7 @@ def cmd_validate(_args):
             EXT_DIR / "background.js",
             EXT_DIR / "content.js",
             EXT_DIR / "content.css",
+            EXT_DIR / "page_defuser.js",
             EXT_DIR / "popup.html",
             EXT_DIR / "popup.js",
             EXT_DIR / "dashboard.html",
@@ -499,7 +500,7 @@ def cmd_validate(_args):
         csp = m.get("content_security_policy", {}).get("extension_pages", "")
         has_strict_csp = "connect-src 'self'" in csp or "connect-src 'none'" in csp
         external_calls = []
-        for js_name in ("background.js", "content.js", "popup.js", "dashboard.js"):
+        for js_name in ("background.js", "content.js", "page_defuser.js", "popup.js", "dashboard.js"):
             js_path = EXT_DIR / js_name
             if js_path.exists():
                 code = js_path.read_text(encoding="utf-8")

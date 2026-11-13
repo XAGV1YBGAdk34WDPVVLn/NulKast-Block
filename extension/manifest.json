@@ -67,6 +67,18 @@
         "http://*/*",
         "https://*/*"
       ],
+      "js": [
+        "page_defuser.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
       "css": [
         "content.css"
       ],
@@ -92,7 +104,8 @@
         "surrogates/google_ima3.js",
         "surrogates/adsbygoogle.js",
         "surrogates/google_analytics.js",
-        "surrogates/fbevents.js"
+        "surrogates/fbevents.js",
+        "surrogates/anti_adblock_noop.js"
       ],
       "matches": [
         "http://*/*",

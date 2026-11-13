@@ -124,6 +124,7 @@ class TestAegisBlockExtension(unittest.TestCase):
         js_files = [
             "background.js",
             "content.js",
+            "page_defuser.js",
             "popup.js",
             "dashboard.js",
             "surrogates/googletag_gpt.js",
@@ -131,6 +132,7 @@ class TestAegisBlockExtension(unittest.TestCase):
             "surrogates/adsbygoogle.js",
             "surrogates/google_analytics.js",
             "surrogates/fbevents.js",
+            "surrogates/anti_adblock_noop.js",
         ]
         for js_name in js_files:
             js_path = EXT_DIR / js_name
@@ -163,6 +165,21 @@ class TestAegisBlockExtension(unittest.TestCase):
         )
         for mod_param in ("srsltid", "irclickid", "cjevent", "epik", "rdt_cid", "sccid"):
             self.assertIn(mod_param, removed_params)
+
+        # Verify Rotten Tomatoes / Admiral / Adobe DTM / Funding Choices anti-adblock domains are blocked
+        catalog = json.loads((RULES_DIR / "rule_catalog.json").read_text(encoding="utf-8"))
+        covered = set(catalog.get("coveredDomains", []))
+        for anti_ab_dom in (
+            "getadmiral.com",
+            "chalkdream.com",
+            "succeedscene.com",
+            "adobedtm.com",
+            "assets.adobedtm.com",
+            "fundingchoicesmessages.google.com",
+            "mps.vsnt.net",
+            "app.mps.vsnt.net",
+        ):
+            self.assertIn(anti_ab_dom, covered, f"Anti-adblock domain {anti_ab_dom} must be blocked in DNR catalog")
 
     def test_05_background_service_worker_runtime_simulation_in_node(self):
         """
@@ -360,10 +377,12 @@ class TestAegisBlockExtension(unittest.TestCase):
             "background.js",
             "content.js",
             "content.css",
+            "page_defuser.js",
             "popup.html",
             "popup.js",
             "dashboard.html",
             "dashboard.js",
+            "surrogates/anti_adblock_noop.js",
             "rules/ads_core.json",
             "rules/trackers_privacy.json",
             "rules/url_privacy_clean.json",

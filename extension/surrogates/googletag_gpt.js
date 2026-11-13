@@ -63,7 +63,22 @@
   const pubadsService = {
     addEventListener: function (type, fn) {
       if (!listeners[type]) listeners[type] = [];
-      if (typeof fn === "function") listeners[type].push(fn);
+      if (typeof fn === "function") {
+        listeners[type].push(fn);
+        if (type === "slotRenderEnded" || type === "slotOnload") {
+          setTimeout(() => {
+            try {
+              const mockSlot = slots[0] || createSlotMock("/aegis/slot", [[728, 90]], "div-gpt-ad-0");
+              fn({
+                isEmpty: false,
+                size: [728, 90],
+                slot: mockSlot,
+                serviceName: "publisher_ads"
+              });
+            } catch (_) {}
+          }, 0);
+        }
+      }
       return this;
     },
     clear: noopBool,

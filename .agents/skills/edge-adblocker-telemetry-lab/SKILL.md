@@ -1,8 +1,8 @@
 ---
 name: edge-adblocker-telemetry-lab
 description: Use this skill when building, updating, auditing, or analyzing the AegisBlock Microsoft Edge Manifest V3 AdBlocker & Self-Learning Telemetry Lab in /home/user/code/extensions/adblocker (synced to C:\Users\oz_co\code\extensions\adblocker), including static & dynamic declarativeNetRequest rulesets, URL tracking parameter & header sanitizers, cosmetic DOM/video ad guards, Shadow-DOM Element Zapper, heuristic evasion discovery, and SQLite rule synthesis via cli.py.
-version: "1.1.0"
-last_updated: "2026-11-09"
+version: "1.2.0"
+last_updated: "2026-11-13"
 target_modules:
   - "cli.py"
   - "scripts/build_rules.py"
@@ -10,6 +10,7 @@ target_modules:
   - "extension/background.js"
   - "extension/content.js"
   - "extension/content.css"
+  - "extension/page_defuser.js"
   - "extension/popup.html"
   - "extension/popup.js"
   - "extension/dashboard.html"
@@ -19,6 +20,7 @@ target_modules:
   - "extension/surrogates/adsbygoogle.js"
   - "extension/surrogates/google_analytics.js"
   - "extension/surrogates/fbevents.js"
+  - "extension/surrogates/anti_adblock_noop.js"
   - "tests/test_adblocker.py"
 ---
 
@@ -43,10 +45,11 @@ target_modules:
    - `ads_core` (`rules/ads_core.json`): High-efficiency `requestDomains` + `urlFilter` rules for ad networks, RTB auctions, VAST/IMA video ads, popunders, and learned SQLite domains (Rule `#1900`), plus priority-30 `redirect.extensionPath` surrogates for Google Publisher Tags (`googletag_gpt.js`), IMA3 Video SDK (`google_ima3.js`), and AdSense (`adsbygoogle.js`).
    - `trackers_privacy` (`rules/trackers_privacy.json`): Cross-site trackers, session replay (`hotjar`, `clarity.ms`, `fullstory`), fingerprinting scripts, third-party `ping`/`csp_report` beacons, surgical rules sparing dual-use functional domains (`intercom.io`, `hubspot.com`, `t.co`, `sc-static.net`, `sentry-cdn.com`), and priority-30 local surrogates for `analytics.js`/`gtag/js` (`google_analytics.js`) and `fbevents.js`.
    - `url_privacy_clean` (`rules/url_privacy_clean.json`): Native C++ `redirect.transform.queryTransform.removeParams` stripping 53 tracking parameters (`utm_*`, `fbclid`, `gclid`, `srsltid`, `irclickid`, `cjevent`, `epik`, `rdt_cid`, `sccid`, `msclkid`, `twclid`, `mc_eid`, etc.) + `modifyHeaders` removing `Sec-Browsing-Topics`, `X-Client-Data`, `NEL`, and `Report-To`.
-   - `annoyances_social` (`rules/annoyances_social.json`): Sponsored chumboxes (`taboola`, `outbrain`, `revcontent`, `mgid`) and marketing push popups.
-3. **Pre-Paint Cosmetic Filter, Video Ad Skipper & Element Zapper**:
-   - [`extension/content.css`](file:///home/user/code/extensions/adblocker/extension/content.css) scopes all rules under `:root:not([data-aegisblock-paused="true"])` so per-site pause disarms cosmetic hiding immediately without page reload.
-   - [`extension/content.js`](file:///home/user/code/extensions/adblocker/extension/content.js) includes an interactive Shadow-DOM **Element Zapper** (`Alt+Shift+Z`) and automatic video pre-roll skip/fast-forward guard.
+   - `annoyances_social` (`rules/annoyances_social.json`): Sponsored chumboxes (`taboola`, `outbrain`, `revcontent`, `mgid`), marketing push popups, and Anti-Adblock / Visitor Recovery walls (`getadmiral.com`, `chalkdream.com`, `succeedscene.com`, `fundingchoicesmessages.google.com`, `blockthrough.com`, `pagefair.com`, `adrecover.com`) + priority-30 surrogate redirects (`anti_adblock_noop.js`) for Adobe Launch / Admiral bootstrapper scripts (`RCe0c7c73598674c2288fae1d365c8dd9d`, `/admiral*.js`, `/fuckadblock`, `/blockadblock`).
+3. **Pre-Paint Cosmetic Filter, MAIN-World Anti-Adblock Defuser, Scroll-Lock Unlocker & Element Zapper**:
+   - [`extension/page_defuser.js`](file:///home/user/code/extensions/adblocker/extension/page_defuser.js) runs at `document_start` in the page's `MAIN` JS world to trap `window.admiral`, `window.BlockAdBlock`, `window.FuckAdBlock`, `window.canRunAds = true`, and `window.isAdBlockActive = false`, and intercepts dynamic `<script>` injection (`appendChild`/`insertBefore`) for Admiral/anti-adblock script URLs before they execute.
+   - [`extension/content.css`](file:///home/user/code/extensions/adblocker/extension/content.css) scopes all rules under `:root:not([data-aegisblock-paused="true"])` (including `.fc-ab-root`, `[class^="admiral-"]`, `[class*="fEy1Z2XT"]`, and `[data-aegis-scroll-unlocked="true"]` scroll-unlock overrides) so per-site pause disarms cosmetic hiding immediately without page reload.
+   - [`extension/content.js`](file:///home/user/code/extensions/adblocker/extension/content.js) includes `neutralizeAntiAdblockWallsAndUnlockScroll()` (automatically removing `"Powered by Admiral"` / anti-adblock modals and unlocking `overflow: hidden` / `position: fixed` scroll locks on `<html>` and `<body>`), an interactive Shadow-DOM **Element Zapper** (`Alt+Shift+Z`), and automatic video pre-roll skip/fast-forward guard.
 4. **Heuristic Evasion, First-Party Cloaking & False-Positive Breakage Sensors**:
    - Passively inspects unblocked third-party resources and first-party cloaked ad endpoints (`FIRST_PARTY_CLOAKED_AD`) via `PerformanceObserver`, DOM iframe scanning (IAB standard ad dimensions `300x250`/`728x90`), and visible filled ad-slot leak detection (`REPORT_VISUAL_AD_LEAK`).
    - Passively detects page breakage (`SCRIPT_LOAD_BLOCKED`, `MISSING_SDK_GLOBAL`, `ANTI_ADBLOCK_WALL_DETECTED`, `RAPID_TAB_RELOAD`, and `USER_PAUSED_SITE`), correlates the failure with the exact DNR rule ID that fired on that tab, and enables 1-click surgical per-site domain exceptions (`ALLOW_DOMAIN_ON_SITE`, priority `6000`).

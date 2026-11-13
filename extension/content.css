@@ -47,6 +47,12 @@
 :root:not([data-aegisblock-paused="true"]) .ytp-ad-overlay-container,
 :root:not([data-aegisblock-paused="true"]) .ytp-ad-message-container,
 :root:not([data-aegisblock-paused="true"]) .ytp-featured-product,
+:root:not([data-aegisblock-paused="true"]) .fc-ab-root,
+:root:not([data-aegisblock-paused="true"]) .fc-whitelist-root,
+:root:not([data-aegisblock-paused="true"]) .fc-dialog-overlay,
+:root:not([data-aegisblock-paused="true"]) [class^="admiral-"],
+:root:not([data-aegisblock-paused="true"]) [id^="admiral-"],
+:root:not([data-aegisblock-paused="true"]) [class*="fEy1Z2XT"],
 :root:not([data-aegisblock-paused="true"]) [data-aegis-hidden="true"] {
   display: none !important;
   visibility: hidden !important;
@@ -58,4 +64,17 @@
   border: 0 !important;
   overflow: hidden !important;
   pointer-events: none !important;
+}
+
+/* Restore scrolling when AegisBlock neutralizes an anti-adblock modal (e.g. Admiral / Funding Choices) */
+:root:not([data-aegisblock-paused="true"])[data-aegis-scroll-unlocked="true"],
+:root:not([data-aegisblock-paused="true"])[data-aegis-scroll-unlocked="true"] body,
+:root:not([data-aegisblock-paused="true"]) body[data-aegis-scroll-unlocked="true"] {
+  overflow: auto !important;
+  overflow-y: auto !important;
+  position: static !important;
+  height: auto !important;
+  pointer-events: auto !important;
+  filter: none !important;
+  user-select: auto !important;
 }
