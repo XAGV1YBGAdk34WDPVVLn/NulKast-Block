@@ -1,13 +1,13 @@
 /**
- * AegisBlock — Content Script (ISOLATED World)
+ * NulKast-Block — Content Script (ISOLATED World)
  * 1. Pre-paint & Dynamic Cosmetic Filtering + Video Ad Skipper
  * 2. Heuristic Evasion Sensor (discovers unblocked 3rd-party ads/trackers for Research Lab)
  * 3. Shadow-DOM Interactive Element Zapper (Alt+Shift+Z or triggered from Popup)
  */
 
 (() => {
-  if (window.__aegisBlockContentLoaded) return;
-  window.__aegisBlockContentLoaded = true;
+  if (window.__nulkastBlockContentLoaded) return;
+  window.__nulkastBlockContentLoaded = true;
 
   const CURRENT_HOST = (location.hostname || "").toLowerCase().replace(/^www\./, "");
   if (!CURRENT_HOST || location.protocol === "chrome-extension:" || location.protocol === "edge:") {
@@ -96,26 +96,26 @@
     const root = document.documentElement;
     if (!root) return;
     if (isSitePaused) {
-      root.setAttribute("data-aegisblock-paused", "true");
+      root.setAttribute("data-nulkast-block-paused", "true");
     } else {
-      root.removeAttribute("data-aegisblock-paused");
+      root.removeAttribute("data-nulkast-block-paused");
     }
   }
 
   function applyCustomSelectors(selectors) {
     customSelectors = Array.isArray(selectors) ? selectors : [];
-    let styleEl = document.getElementById("aegisblock-custom-cosmetics");
+    let styleEl = document.getElementById("nulkast-block-custom-cosmetics");
     if (customSelectors.length === 0) {
       if (styleEl) styleEl.remove();
       return;
     }
     if (!styleEl) {
       styleEl = document.createElement("style");
-      styleEl.id = "aegisblock-custom-cosmetics";
+      styleEl.id = "nulkast-block-custom-cosmetics";
       (document.head || document.documentElement).appendChild(styleEl);
     }
     const rules = customSelectors
-      .map((sel) => `:root:not([data-aegisblock-paused="true"]) ${sel}`)
+      .map((sel) => `:root:not([data-nulkast-block-paused="true"]) ${sel}`)
       .join(",\n");
     styleEl.textContent = `${rules} { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; pointer-events: none !important; }`;
   }
@@ -153,7 +153,7 @@
         for (const node of nodes) {
           if (!countedCosmeticNodes.has(node)) {
             countedCosmeticNodes.add(node);
-            node.setAttribute("data-aegis-hidden", "true");
+            node.setAttribute("data-nulkast-hidden", "true");
             queueCosmeticTelemetry(sel, (node.tagName || "DIV").toLowerCase());
           }
         }
@@ -336,11 +336,11 @@
     for (const sel of leakSelectors) {
       const nodes = document.querySelectorAll(sel);
       for (const node of nodes) {
-        if (inspectedLeakNodes.has(node) || node.hasAttribute("data-aegis-hidden")) continue;
+        if (inspectedLeakNodes.has(node) || node.hasAttribute("data-nulkast-hidden")) continue;
         const rect = node.getBoundingClientRect();
         if (rect.width >= 120 && rect.height >= 45) {
           inspectedLeakNodes.add(node);
-          node.setAttribute("data-aegis-hidden", "true");
+          node.setAttribute("data-nulkast-hidden", "true");
           node.style.setProperty("display", "none", "important");
           chrome.runtime.sendMessage({
             type: "REPORT_VISUAL_AD_LEAK",
@@ -359,7 +359,7 @@
   function unlockPageScroll() {
     for (const rootEl of [document.documentElement, document.body]) {
       if (!rootEl) continue;
-      rootEl.setAttribute("data-aegis-scroll-unlocked", "true");
+      rootEl.setAttribute("data-nulkast-scroll-unlocked", "true");
       rootEl.style.setProperty("overflow", "auto", "important");
       rootEl.style.setProperty("overflow-y", "auto", "important");
       rootEl.style.setProperty("position", "static", "important");
@@ -411,7 +411,7 @@
       const modalRoot = findTopModalBackdrop(node);
       if (modalRoot && modalRoot !== document.body && modalRoot !== document.documentElement) {
         wallDetail = synthesizeCssSelector(modalRoot) || "admiral-or-fc-modal";
-        modalRoot.setAttribute("data-aegis-hidden", "true");
+        modalRoot.setAttribute("data-nulkast-hidden", "true");
         modalRoot.style.setProperty("display", "none", "important");
         try {
           modalRoot.remove();
@@ -425,7 +425,7 @@
       '[id*="adblock" i], [class*="adblock" i], [role="dialog"], [aria-modal="true"], body > div, overlay-base'
     );
     for (const el of candidateModals) {
-      if (!el || el === zapperHost || el.hasAttribute("data-aegis-hidden")) continue;
+      if (!el || el === zapperHost || el.hasAttribute("data-nulkast-hidden")) continue;
       const txt = (el.textContent || "").slice(0, 900);
       if (!txt) continue;
 
@@ -447,7 +447,7 @@
       if (isOverlay) {
         const modalRoot = findTopModalBackdrop(el);
         wallDetail = synthesizeCssSelector(modalRoot) || "anti-adblock-modal";
-        modalRoot.setAttribute("data-aegis-hidden", "true");
+        modalRoot.setAttribute("data-nulkast-hidden", "true");
         modalRoot.style.setProperty("display", "none", "important");
         try {
           modalRoot.remove();
@@ -643,7 +643,7 @@
     zapperActive = true;
 
     zapperHost = document.createElement("div");
-    zapperHost.id = "aegisblock-zapper-host";
+    zapperHost.id = "nulkast-block-zapper-host";
     zapperHost.style.cssText = "position:fixed;inset:0;z-index:2147483647;pointer-events:none;";
     const shadow = zapperHost.attachShadow({ mode: "closed" });
 
@@ -770,7 +770,7 @@
     e.stopPropagation();
     const sel = synthesizeCssSelector(hoveredTarget);
     if (sel) {
-      hoveredTarget.setAttribute("data-aegis-hidden", "true");
+      hoveredTarget.setAttribute("data-nulkast-hidden", "true");
       if (!customSelectors.includes(sel)) {
         customSelectors.push(sel);
         applyCustomSelectors(customSelectors);

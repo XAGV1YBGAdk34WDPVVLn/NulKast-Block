@@ -1,5 +1,5 @@
 /**
- * AegisBlock — Blocker Research & Analytics Studio Controller
+ * NulKast-Block — Blocker Research & Analytics Studio Controller
  */
 
 let currentState = null;
@@ -731,8 +731,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Auto-refresh when chrome.storage.local updates
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.aegisblock_state_v1) {
-      currentState = changes.aegisblock_state_v1.newValue;
+    if (area === "local" && changes.nulkast_block_state_v1) {
+      currentState = changes.nulkast_block_state_v1.newValue;
       renderDashboard();
     }
   });
@@ -757,11 +757,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentState) return;
     const payload = {
       exportedAt: new Date().toISOString(),
-      extension: "AegisBlock MV3",
+      extension: "NulKast-Block MV3",
       state: currentState,
       synthesizedDnrRules: buildSynthesizedDnrJson(currentState)
     };
-    downloadJsonFile(`aegisblock-telemetry-${Date.now()}.json`, payload);
+    downloadJsonFile(`nulkast-block-telemetry-${Date.now()}.json`, payload);
     showToast("Exported research telemetry JSON!");
   });
 

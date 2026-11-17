@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Google AdSense (adsbygoogle.js)
+ * NulKast-Block Surrogate — Google AdSense (adsbygoogle.js)
  * Satisfies publisher scripts checking window.adsbygoogle.loaded without network calls.
  */
 (() => {

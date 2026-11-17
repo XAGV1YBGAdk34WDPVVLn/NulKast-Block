@@ -1,12 +1,12 @@
 /**
- * AegisBlock — Manifest V3 Background Service Worker
+ * NulKast-Block — Manifest V3 Background Service Worker
  * - Zero-Leak Local Telemetry & Rule Analytics Engine
  * - Real-time DNR Match Collector (onRuleMatchedDebug)
  * - Self-Learning Heuristic Evasion Evaluator & Dynamic DNR Rule Synthesizer
  * - Per-Site Allowlist (allowAllRequests) & Custom Cosmetic Selector Manager
  */
 
-const STORAGE_KEY = "aegisblock_state_v1";
+const STORAGE_KEY = "nulkast_block_state_v1";
 const ALLOWLIST_RULE_ID_BASE = 50000;
 const SITE_EXCEPTION_RULE_ID_BASE = 60000;
 const DYNAMIC_BLOCK_RULE_ID_BASE = 10000;
@@ -78,7 +78,7 @@ async function loadRuleCatalog() {
       coveredDomainSet = new Set(ruleCatalog.coveredDomains || []);
     }
   } catch (err) {
-    console.warn("[AegisBlock] Failed to load rule_catalog.json:", err);
+    console.warn("[NulKast-Block] Failed to load rule_catalog.json:", err);
   }
 }
 
@@ -977,7 +977,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const recentBlocked = (tTracker && tTracker.recentDomains) || [];
         const recentRules = (tTracker && tTracker.recentRuleIds) || [];
 
-        // Only flag if the failed script or page error correlates with a domain blocked by AegisBlock
+        // Only flag if the failed script or page error correlates with a domain blocked by NulKast-Block
         let correlatedDomain = "";
         let correlatedRuleId = recentRules[0] || 0;
         if (failedHost && (isDomainAlreadyBlocked(failedHost, state) || recentBlocked.includes(failedHost))) {

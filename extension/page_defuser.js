@@ -1,12 +1,12 @@
 /**
- * AegisBlock — MAIN World Pre-Execution Anti-Adblock & Scroll-Lock Defuser
+ * NulKast-Block — MAIN World Pre-Execution Anti-Adblock & Scroll-Lock Defuser
  * Runs at `document_start` in the page's MAIN JS world to disarm Admiral ("Powered by Admiral"),
  * Google Funding Choices, and BlockAdBlock before inline or tag-manager scripts can initialize them.
  */
 (() => {
   const isPaused = () =>
     document.documentElement &&
-    document.documentElement.getAttribute("data-aegisblock-paused") === "true";
+    document.documentElement.getAttribute("data-nulkast-block-paused") === "true";
 
   if (isPaused()) return;
 
@@ -123,7 +123,7 @@
     if (isBlockedAntiAdblockScript(newNode)) {
       const dummy = document.createElement("script");
       dummy.type = "text/plain";
-      dummy.setAttribute("data-aegis-stripped", "admiral-script");
+      dummy.setAttribute("data-nulkast-stripped", "admiral-script");
       return origInsertBefore.call(this, dummy, refNode);
     }
     return origInsertBefore.call(this, newNode, refNode);
@@ -134,7 +134,7 @@
     if (isBlockedAntiAdblockScript(newNode)) {
       const dummy = document.createElement("script");
       dummy.type = "text/plain";
-      dummy.setAttribute("data-aegis-stripped", "admiral-script");
+      dummy.setAttribute("data-nulkast-stripped", "admiral-script");
       return origAppendChild.call(this, dummy);
     }
     return origAppendChild.call(this, newNode);

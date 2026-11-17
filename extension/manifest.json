@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "AegisBlock — Zero-Leak AdBlocker & Telemetry Lab",
-  "short_name": "AegisBlock",
+  "name": "NulKast-Block — Zero-Leak MV3 AdBlocker",
+  "short_name": "NulKastBlock",
   "version": "1.0.0",
-  "description": "Fast, zero-leak Manifest V3 AdBlocker for Microsoft Edge with native C++ DNR blocking, URL tracker sanitization, cosmetic element zapper, and local-only blocker research & rule synthesis analytics.",
+  "description": "Fast, zero-leak Manifest V3 AdBlocker for Edge & Chrome with C++ DNR blocking, URL tracker scrubbing, surrogates & Element Zapper.",
   "minimum_chrome_version": "120",
   "icons": {
     "16": "icons/icon16.png",
@@ -12,7 +12,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "AegisBlock — Zero-Leak AdBlocker & Telemetry Lab",
+    "default_title": "NulKast-Block — Zero-Leak MV3 AdBlocker",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

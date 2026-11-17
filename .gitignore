@@ -14,7 +14,7 @@ dist/
 data/*.db
 data/*.db-shm
 data/*.db-wal
-aegisblock-telemetry-*.json
+nulkast-block-telemetry-*.json
 scratch/
 
 # Extension keys & packaged archives

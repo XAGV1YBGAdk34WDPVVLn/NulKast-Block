@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AegisBlock — Research, Analytics, DNR Rule Synthesizer & 6-Gate QA CLI.
+NulKast-Block — Research, Analytics, DNR Rule Synthesizer, Store Packager & 6-Gate QA CLI.
 Backed by SQLite WAL (`data/adblock_research.db`).
 """
 
@@ -12,6 +12,7 @@ import shutil
 import sqlite3
 import sys
 import time
+import zipfile
 from pathlib import Path
 
 from scripts.build_rules import (
@@ -24,11 +25,12 @@ ROOT_DIR = Path(__file__).resolve().parent
 EXT_DIR = ROOT_DIR / "extension"
 RULES_DIR = EXT_DIR / "rules"
 DATA_DIR = ROOT_DIR / "data"
+DIST_DIR = ROOT_DIR / "dist"
 DB_PATH = DATA_DIR / "adblock_research.db"
 
 
 def _resolve_windows_ext_dir() -> Path:
-    env_dir = os.environ.get("AEGISBLOCK_WIN_DIR")
+    env_dir = os.environ.get("NULKAST_BLOCK_WIN_DIR")
     if env_dir:
         return Path(env_dir)
     users_root = Path("/mnt/c/Users")
@@ -141,7 +143,7 @@ def compile_learned_rules_into_extension(conn: sqlite3.Connection):
     catalog["rules"]["1900"] = {
         "id": 1900,
         "ruleset": "ads_core",
-        "vendor": "AegisBlock Self-Learning Research Ruleset",
+        "vendor": "NulKast-Block Self-Learning Research Ruleset",
         "category": "Learned Ad/Tracker Network",
         "description": f"Blocks {len(learned_domains)} domain(s) synthesized by the Heuristic Research Engine",
         "patternSummary": f"{learned_domains[0]} (+{max(0, len(learned_domains) - 1)} more)",
@@ -165,7 +167,7 @@ def cmd_build(_args):
     build_all()
     learned_cnt = compile_learned_rules_into_extension(conn)
     if learned_cnt:
-        print(f"[AegisBlock Compiler] Merged {learned_cnt} learned research domain(s) into static DNR ruleset #1900.")
+        print(f"[NulKast-Block Compiler] Merged {learned_cnt} learned research domain(s) into static DNR ruleset #1900.")
 
 
 def cmd_sync(_args):
@@ -179,8 +181,92 @@ def cmd_sync(_args):
             shutil.copytree(item, dest)
         else:
             shutil.copy2(item, dest)
-    print(f"[AegisBlock Sync] Synced unpacked extension to {WINDOWS_EXT_DIR}")
-    print("  -> Load unpacked in Microsoft Edge (`edge://extensions`) from the synced directory.")
+    print(f"[NulKast-Block Sync] Synced unpacked extension to {WINDOWS_EXT_DIR}")
+    print("  -> Load unpacked in Microsoft Edge (`edge://extensions`) or Chrome (`chrome://extensions`) from the synced directory.")
+
+
+def cmd_package_store(_args):
+    """
+    Packages a Chrome Web Store & Microsoft Edge Add-ons compliant .zip archive:
+    - Places `manifest.json` at the root of the ZIP archive with POSIX forward slashes
+    - Automatically strips unpacked-only `declarativeNetRequestFeedback` from the store manifest
+    - Validates store manifest limits (`name` <= 45, `short_name` <= 12, `description` <= 132 chars)
+    - Generates `dist/STORE_SUBMISSION_GUIDE.md` with copy-paste permission justifications
+    """
+    DIST_DIR.mkdir(parents=True, exist_ok=True)
+    manifest_raw = json.loads((EXT_DIR / "manifest.json").read_text(encoding="utf-8"))
+    version = manifest_raw.get("version", "1.0.0")
+
+    # Strip unpacked-only declarativeNetRequestFeedback permission for official store submission
+    store_manifest = dict(manifest_raw)
+    store_manifest["permissions"] = [
+        p for p in manifest_raw.get("permissions", []) if p != "declarativeNetRequestFeedback"
+    ]
+
+    # Validate CWS / Edge Partner Center length limits
+    if len(store_manifest.get("name", "")) > 45:
+        raise ValueError(f"Store manifest 'name' exceeds 45 chars: {store_manifest['name']!r}")
+    if len(store_manifest.get("short_name", "")) > 12:
+        raise ValueError(f"Store manifest 'short_name' exceeds 12 chars: {store_manifest['short_name']!r}")
+    if len(store_manifest.get("description", "")) > 132:
+        raise ValueError(f"Store manifest 'description' exceeds 132 chars: {store_manifest['description']!r}")
+
+    zip_path = DIST_DIR / f"nulkast-block-store-v{version}.zip"
+    if zip_path.exists():
+        zip_path.unlink()
+
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("manifest.json", json.dumps(store_manifest, indent=2) + "\n")
+        for file_path in sorted(EXT_DIR.rglob("*")):
+            if not file_path.is_file():
+                continue
+            rel_posix = file_path.relative_to(EXT_DIR).as_posix()
+            if rel_posix == "manifest.json":
+                continue
+            if any(part.startswith(".") or part == "__pycache__" for part in file_path.parts):
+                continue
+            zf.write(file_path, arcname=rel_posix)
+
+    guide_path = DIST_DIR / "STORE_SUBMISSION_GUIDE.md"
+    guide_path.write_text(
+        f"""# 🛡️ NulKast-Block Store Submission Guide (`v{version}`)
+
+## 1. Store-Ready Archive
+- **Package File:** `{zip_path}`
+- **Root Layout:** `manifest.json` at ZIP root (`declarativeNetRequestFeedback` automatically stripped for Chrome Web Store & Microsoft Edge Add-ons store compliance).
+- **Privacy Declaration:** Select **"No, I do not collect any user data"** (`connect-src 'self'` enforced in `manifest.json`).
+
+## 2. Copy-Paste Permission Justifications (Chrome Web Store & Edge Partner Center)
+
+- **Single Purpose Description:**
+  `NulKast-Block has a single purpose: blocking web advertisements, tracking scripts, click-tracking URL parameters, and page-breaking anti-adblock overlays while keeping all data 100% offline (connect-src 'self').`
+
+- **`declarativeNetRequest` Justification:**
+  `Required to block known advertising networks, third-party tracking beacons, and annoyance widgets using native browser C++ static and dynamic rulesets without inspecting user network payloads.`
+
+- **`declarativeNetRequestWithHostAccess` Justification:**
+  `Required to perform surgical URL query-parameter sanitization (redirect.transform.queryTransform.removeParams for utm_*, fbclid, gclid, msclkid), privacy header stripping (modifyHeaders), and local no-op surrogate script redirects (redirect.extensionPath) to prevent site breakage when blocking ad/tracker SDKs.`
+
+- **`storage` Justification:**
+  `Required to store user preferences, per-site pause allowlists, custom Element Zapper CSS selectors, and 100% local on-device blocker statistics in chrome.storage.local (zero cloud sync or external transmission).`
+
+- **`scripting` Justification:**
+  `Required to apply user-created cosmetic Element Zapper rules and pre-paint anti-adblock/scroll-lock defusers on active pages.`
+
+- **`activeTab` Justification:**
+  `Required to toggle per-site adblocking pause/resume and launch the interactive Element Zapper (Alt+Shift+Z) on the currently active tab when invoked by the user.`
+
+- **`tabs` Justification:**
+  `Required to update the per-tab blocked-request badge counter, correlate per-site breakage recovery (ALLOW_DOMAIN_ON_SITE) with the active tab hostname, and refresh a tab when the user toggles site pause.`
+
+- **Host Permission (`<all_urls>`) Justification:**
+  `Required because advertising networks, tracking scripts, URL click-tracking parameters, and anti-adblock overlays appear across arbitrary user-visited websites; needed by declarativeNetRequestWithHostAccess redirects/header transforms and pre-paint cosmetic content scripts.`
+""",
+        encoding="utf-8",
+    )
+    print(f"[NulKast-Block Store Packager] Built store-ready archive: {zip_path}")
+    print(f"[NulKast-Block Store Packager] Wrote copy-paste store justifications: {guide_path}")
+    return zip_path
 
 
 def cmd_ingest(args):
@@ -324,11 +410,11 @@ def cmd_ingest(args):
     conn.commit()
     merged = compile_learned_rules_into_extension(conn)
     print(
-        f"[AegisBlock Research DB] Ingested {len(domain_stats)} blocked domain telemetry records, "
+        f"[NulKast-Block Research DB] Ingested {len(domain_stats)} blocked domain telemetry records, "
         f"{len(suspects)} heuristic evasion candidates, and {len(fp_reports)} breakage diagnostics."
     )
     if merged:
-        print(f"[AegisBlock Synthesizer] Compiled {merged} learned domain(s) into static DNR ruleset #1900.")
+        print(f"[NulKast-Block Synthesizer] Compiled {merged} learned domain(s) into static DNR ruleset #1900.")
 
 
 def cmd_simulate_research(_args):
@@ -427,7 +513,7 @@ def cmd_stats(_args):
     surrogate_rules = [r for r in (catalog.get("rules") or {}).values() if r.get("surrogate")]
 
     print("=" * 74)
-    print(" 🛡️  AegisBlock — Blocker Telemetry & Rule Research Summary")
+    print(" 🛡️  NulKast-Block — Blocker Telemetry & Rule Research Summary")
     print("=" * 74)
     print(f"  Static DNR Rules       : {summary.get('totalStaticRules', 0)} ({len(surrogate_rules)} C++ Surrogate Redirects)")
     print(f"  Covered Ad/Trk Domains : {summary.get('totalCoveredDomains', 0)}")
@@ -468,11 +554,11 @@ def cmd_stats(_args):
 
 
 def cmd_validate(_args):
-    """Deterministic 6-Gate Pre-Flight QA Validator for AegisBlock MV3."""
+    """Deterministic 6-Gate Pre-Flight QA Validator for NulKast-Block MV3."""
     conn = get_db()
     gates = []
 
-    # Gate 1: Manifest V3 & Permission Minimalism
+    # Gate 1: Manifest V3, Store Length Limits & Asset Integrity
     manifest_path = EXT_DIR / "manifest.json"
     g1_ok = False
     g1_msg = ""
@@ -492,16 +578,20 @@ def cmd_validate(_args):
             EXT_DIR / "icons" / "icon128.png",
         ]
         missing = [str(p.name) for p in required_files if not p.exists()]
+        desc_len = len(m.get("description", ""))
+        name_len = len(m.get("name", ""))
         if (
             m.get("manifest_version") == 3
             and "declarativeNetRequest" in perms
             and "declarativeNetRequestFeedback" in perms
             and not missing
+            and name_len <= 45
+            and desc_len <= 132
         ):
             g1_ok = True
-            g1_msg = f"MV3 valid, all {len(required_files)} core files & icons present"
+            g1_msg = f"MV3 valid, all {len(required_files)} core files present, store limits OK (desc={desc_len}/132)"
         else:
-            g1_msg = f"Missing files or perms: {missing}"
+            g1_msg = f"Missing files/perms or store length exceeded: missing={missing}, name={name_len}, desc={desc_len}"
     else:
         g1_msg = "manifest.json missing"
     gates.append(("Gate 1: Manifest V3 & Asset Integrity", g1_ok, g1_msg))
@@ -588,7 +678,7 @@ def cmd_validate(_args):
     css_code = (EXT_DIR / "content.css").read_text(encoding="utf-8") if (EXT_DIR / "content.css").exists() else ""
     js_code = (EXT_DIR / "content.js").read_text(encoding="utf-8") if (EXT_DIR / "content.js").exists() else ""
     g5_ok = (
-        ':root:not([data-aegisblock-paused="true"])' in css_code
+        ':root:not([data-nulkast-block-paused="true"])' in css_code
         and "REPORT_HEURISTIC_SUSPECT" in js_code
         and "START_ELEMENT_ZAPPER" in js_code
     )
@@ -615,7 +705,7 @@ def cmd_validate(_args):
     conn.commit()
 
     print("=" * 74)
-    print(f" 🛡️  AegisBlock 6-Gate Pre-Flight QA Report (Score: {score}/100)")
+    print(f" 🛡️  NulKast-Block 6-Gate Pre-Flight QA Report (Score: {score}/100)")
     print("=" * 74)
     for title, ok, detail in gates:
         badge = "PASS" if ok else "FAIL"
@@ -626,18 +716,19 @@ def cmd_validate(_args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="AegisBlock MV3 Research & Rule Compiler CLI")
+    parser = argparse.ArgumentParser(description="NulKast-Block MV3 Research, Store Packager & Rule Compiler CLI")
     sub = parser.add_subparsers(dest="cmd")
 
     sub.add_parser("build", help="Compile static DNR rulesets, icons, and SQLite learned rules")
     sub.add_parser("sync", help="Sync unpacked extension to target Windows/local directory")
+    sub.add_parser("package-store", help="Build Chrome Web Store & Microsoft Edge Add-ons .zip package")
     sub.add_parser("validate", help="Run 6-Gate Pre-Flight QA Validator")
     sub.add_parser("test", help="Run the automated Python + Node.js MV3 test suite")
     sub.add_parser("stats", help="Display Blocker Research & Telemetry Summary")
     sub.add_parser("simulate-research", help="Seed benchmark multi-site telemetry into SQLite and synthesize rules")
 
     p_ing = sub.add_parser("ingest", help="Ingest exported telemetry JSON from browser Research Studio")
-    p_ing.add_argument("file", help="Path to exported aegisblock-telemetry-*.json")
+    p_ing.add_argument("file", help="Path to exported nulkast-block-telemetry-*.json")
     p_ing.add_argument("--auto-synthesize", action="store_true", default=True, help="Auto-promote high-confidence suspects")
     p_ing.add_argument("--min-confidence", type=int, default=80, help="Minimum confidence threshold (default: 80)")
 
@@ -646,6 +737,8 @@ def main():
         cmd_build(args)
     elif args.cmd == "sync":
         cmd_sync(args)
+    elif args.cmd == "package-store":
+        cmd_package_store(args)
     elif args.cmd == "validate":
         cmd_validate(args)
     elif args.cmd == "test":

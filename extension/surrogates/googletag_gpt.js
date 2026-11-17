@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Google Publisher Tags (gpt.js / pubads_impl.js)
+ * NulKast-Block Surrogate — Google Publisher Tags (gpt.js / pubads_impl.js)
  * Neutralizes GPT ad requests while satisfying publisher page scripts expecting window.googletag.
  */
 (() => {
@@ -68,7 +68,7 @@
         if (type === "slotRenderEnded" || type === "slotOnload") {
           setTimeout(() => {
             try {
-              const mockSlot = slots[0] || createSlotMock("/aegis/slot", [[728, 90]], "div-gpt-ad-0");
+              const mockSlot = slots[0] || createSlotMock("/nulkast/slot", [[728, 90]], "div-gpt-ad-0");
               fn({
                 isEmpty: false,
                 size: [728, 90],

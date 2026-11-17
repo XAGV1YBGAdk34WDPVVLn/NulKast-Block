@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Meta / Facebook Pixel (fbevents.js)
+ * NulKast-Block Surrogate — Meta / Facebook Pixel (fbevents.js)
  * Prevents ReferenceError when e-commerce checkout buttons call fbq('track', ...).
  */
 (() => {

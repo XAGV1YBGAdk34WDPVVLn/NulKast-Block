@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive Automated Test Suite for AegisBlock MV3 Edge Extension.
+Comprehensive Automated Test Suite for NulKast-Block MV3 Edge & Chrome Extension.
 Covers:
 1. Chromium C++ `url_pattern_index` & `IndexedRule` DNR grammar validation (including regression test for Rule #1010 `||*` error)
 2. Manifest V3, Zero-Leak CSP, and PNG IHDR binary verification
@@ -8,6 +8,7 @@ Covers:
 4. Dynamic DNR rule generation compliance against Chromium's C++ rule validator
 5. SQLite WAL research ingestion & rule synthesis pipeline
 6. Windows unpacked extension (`C:\\Users\\oz_co\\code\\extensions\\adblocker`) byte-for-byte sync parity
+7. Chrome Web Store & Microsoft Edge Add-ons store `.zip` package compliance
 """
 
 import json
@@ -16,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -31,13 +33,14 @@ from scripts.build_rules import (
 )
 
 
-class TestAegisBlockExtension(unittest.TestCase):
+class TestNulKastBlockExtension(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Rebuild and sync before running assertions
         cli.cmd_build(None)
         cli.cmd_simulate_research(None)
         cli.cmd_sync(None)
+        cli.cmd_package_store(None)
 
     def test_01_chromium_dnr_url_filter_regression_guards(self):
         """
@@ -392,6 +395,22 @@ class TestAegisBlockExtension(unittest.TestCase):
             src_bytes = (EXT_DIR / rel).read_bytes()
             dst_bytes = (win_dir / rel).read_bytes()
             self.assertEqual(src_bytes, dst_bytes, f"Out-of-sync file in Windows unpacked dir: {rel}")
+
+    def test_07_store_zip_package_compliance(self):
+        """Verifies the Chrome Web Store / Edge Add-ons store .zip package layout and permissions."""
+        zip_path = cli.cmd_package_store(None)
+        self.assertTrue(zip_path.exists())
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            names = set(zf.namelist())
+            self.assertIn("manifest.json", names)
+            self.assertIn("background.js", names)
+            self.assertIn("rules/ads_core.json", names)
+            self.assertIn("icons/icon128.png", names)
+            store_manifest = json.loads(zf.read("manifest.json").decode("utf-8"))
+            self.assertNotIn("declarativeNetRequestFeedback", store_manifest.get("permissions", []))
+            self.assertLessEqual(len(store_manifest.get("name", "")), 45)
+            self.assertLessEqual(len(store_manifest.get("short_name", "")), 12)
+            self.assertLessEqual(len(store_manifest.get("description", "")), 132)
 
 
 if __name__ == "__main__":

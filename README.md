@@ -1,6 +1,14 @@
-# 🛡️ AegisBlock — Zero-Leak Manifest V3 AdBlocker & Telemetry Lab
+# 🛡️ NulKast-Block — Zero-Leak Manifest V3 AdBlocker & Telemetry Lab
 
-**AegisBlock** is a fast, zero-bloat **Manifest V3** ad, tracker, and anti-adblock wall blocker for **Microsoft Edge** (and Chromium browsers) paired with a **100% local Blocker Telemetry, Heuristic Evasion Sensor, False-Positive Breakage Correlator, C++ Surrogate Redirector, and Automated DNR Rule Synthesizer**.
+> [!IMPORTANT]
+> **Hobby / Vibe-Coded Project — Provided As-Is With No Support**
+> This repository is a personal, vibe-coded hobby experiment for browser privacy hardening, native C++ `declarativeNetRequest` filtering, and local-only blocker research. **No support, warranty, issue tracking, or maintenance is provided.** Use or fork entirely at your own risk.
+
+---
+
+## Overview
+
+**NulKast-Block** (part of the **NulKast** privacy suite alongside `NulKast Wall`, `NulKast Audit`, `NulKast Scrub`, and `NulKast ChromeOS`) is a fast, zero-bloat **Manifest V3** ad, tracker, and anti-adblock wall blocker for **Microsoft Edge** and **Google Chrome** paired with a **100% local Blocker Telemetry, Heuristic Evasion Sensor, False-Positive Breakage Correlator, C++ Surrogate Redirector, and Automated DNR Rule Synthesizer**.
 
 ---
 
@@ -38,19 +46,25 @@ Redirects blocked ad/analytics/anti-adblock SDK script requests to local, inert 
 
 ---
 
-## 🚀 Quick Start (Microsoft Edge / Chromium)
+## 🚀 Quick Start (Microsoft Edge & Google Chrome)
 
-### 1. Build & Validate Rulesets
+### 1. Build, Package & Validate
 Requires Python 3.10+ (standard library only) and Node.js (for syntax/runtime tests):
 ```bash
 make
 ```
 
-### 2. Load Unpacked Extension in Microsoft Edge
-1. Open Microsoft Edge and navigate to `edge://extensions`.
-2. Enable **Developer mode** in the left sidebar.
-3. Click **Load unpacked** and select the `extension/` folder (or your synced unpacked directory).
-4. Click the **AegisBlock** shield icon in the toolbar to view live blocked/surrogate/false-positive counters, launch the **Element Zapper (`Alt+Shift+Z`)**, or open the full-page **Research & Analytics Studio**.
+### 2. Load Unpacked Extension (Developer Mode)
+1. Open `edge://extensions` (Microsoft Edge) or `chrome://extensions` (Google Chrome).
+2. Enable **Developer mode**.
+3. Click **Load unpacked** and select the `extension/` folder (or your synced Windows unpacked directory).
+4. Click the **NulKast-Block** shield icon in the toolbar to view live blocked/surrogate/false-positive counters, launch the **Element Zapper (`Alt+Shift+Z`)**, or open the full-page **Research & Analytics Studio**.
+
+### 3. Build a Store-Ready `.zip` (Chrome Web Store / Edge Add-ons)
+```bash
+make package-store
+```
+Produces `dist/nulkast-block-store-v1.0.0.zip` (with `manifest.json` at the archive root and unpacked-only `declarativeNetRequestFeedback` automatically stripped) alongside `dist/STORE_SUBMISSION_GUIDE.md` containing copy-paste permission justifications.
 
 ---
 
@@ -67,10 +81,13 @@ python3 cli.py simulate-research
 python3 cli.py stats
 
 # Ingest an exported browser telemetry JSON snapshot and auto-synthesize rules (>=80% confidence)
-python3 cli.py ingest path/to/aegisblock-telemetry.json --auto-synthesize --min-confidence 80
+python3 cli.py ingest path/to/nulkast-block-telemetry.json --auto-synthesize --min-confidence 80
 
-# Sync unpacked extension to target directory (or set AEGISBLOCK_WIN_DIR=/path/to/dir)
+# Sync unpacked extension to target directory (or set NULKAST_BLOCK_WIN_DIR=/path/to/dir)
 python3 cli.py sync
+
+# Build Chrome Web Store & Microsoft Edge Add-ons .zip archive + submission guide
+python3 cli.py package-store
 
 # Run the deterministic 6-Gate Pre-Flight QA Validator
 python3 cli.py validate
@@ -84,9 +101,9 @@ make test
 ## 📂 Project Structure
 
 ```text
-adblocker/
-├── cli.py                           # Research DB, DNR rule synthesizer & 6-Gate QA CLI
-├── Makefile                         # Build, sync, validate, and test targets
+NulKast-Block/
+├── cli.py                           # Research DB, DNR rule synthesizer, Store Packager & 6-Gate QA CLI
+├── Makefile                         # Build, sync, package-store, validate, and test targets
 ├── scripts/
 │   └── build_rules.py               # Static DNR ruleset compiler, Chromium urlFilter validator & PNG generator
 ├── extension/                       # Complete Manifest V3 unpacked browser extension

@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Google IMA3 Video Ad SDK (ima3.js)
+ * NulKast-Block Surrogate — Google IMA3 Video Ad SDK (ima3.js)
  * Prevents HTML5/Video.js/Brightcove/JWPlayer video players from hanging on a black
  * spinner when pre-roll ad requests are blocked by immediately signaling completion.
  */

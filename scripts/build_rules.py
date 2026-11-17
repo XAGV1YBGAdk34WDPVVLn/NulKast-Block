@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AegisBlock MV3 Static DeclarativeNetRequest (DNR) Ruleset & Icon Compiler.
+NulKast-Block MV3 Static DeclarativeNetRequest (DNR) Ruleset & Icon Compiler.
 Generates validated Chromium/Edge Manifest V3 static rulesets, a human-readable
 rule catalog for the Research & Analytics Studio, and crisp PNG toolbar icons.
 """
@@ -1055,7 +1055,7 @@ def create_shield_png(size: int, out_path: Path):
 
             # Check if inside the inner border ring
             is_border = edge_dist < 0.13
-            # Checkmark / Aegis crossbar geometry inside the shield
+            # Checkmark / NulKast shield core geometry inside the shield
             # Let's draw a crisp checkmark / shield core
             # Checkmark segments: p1=(-0.32, 0.04) -> p2=(-0.06, 0.30) -> p3=(0.38, -0.26)
             def dist_to_segment(px, py, x1, y1, x2, y2):
@@ -1310,7 +1310,7 @@ def build_all():
         create_shield_png(sz, ICONS_DIR / f"icon{sz}.png")
 
     print(
-        f"[AegisBlock Compiler] Compiled {len(all_rules)} static DNR rules covering "
+        f"[NulKast-Block Compiler] Compiled {len(all_rules)} static DNR rules covering "
         f"{len(covered_domains)} unique ad/tracker domains across 4 rulesets + 4 PNG icons."
     )
 

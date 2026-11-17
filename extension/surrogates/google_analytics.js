@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Google Analytics & GTag (analytics.js / gtag/js)
+ * NulKast-Block Surrogate — Google Analytics & GTag (analytics.js / gtag/js)
  * Preserves outbound link navigation by invoking hitCallback / event_callback immediately.
  */
 (() => {

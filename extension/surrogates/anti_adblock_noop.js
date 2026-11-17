@@ -1,5 +1,5 @@
 /**
- * AegisBlock Surrogate — Anti-Adblock & Visitor Recovery Neutralizer (Admiral, Funding Choices, BlockAdBlock)
+ * NulKast-Block Surrogate — Anti-Adblock & Visitor Recovery Neutralizer (Admiral, Funding Choices, BlockAdBlock)
  * Satisfies anti-adblock scripts expecting window.admiral / window.googlefc / window.BlockAdBlock without triggering modals.
  */
 (() => {

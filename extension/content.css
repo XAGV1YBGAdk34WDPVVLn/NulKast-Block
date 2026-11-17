@@ -1,59 +1,59 @@
 /* ============================================================================
- * AegisBlock — Pre-Paint Cosmetic Ad & Tracker Container Filter
+ * NulKast-Block — Pre-Paint Cosmetic Ad & Tracker Container Filter
  * Injected at document_start to prevent Cumulative Layout Shift (CLS).
- * Instantly disarmed when :root[data-aegisblock-paused="true"] is set.
+ * Instantly disarmed when :root[data-nulkast-block-paused="true"] is set.
  * ============================================================================ */
 
-:root:not([data-aegisblock-paused="true"]) ins.adsbygoogle,
-:root:not([data-aegisblock-paused="true"]) [id^="google_ads_iframe_"],
-:root:not([data-aegisblock-paused="true"]) [id^="div-gpt-ad-"],
-:root:not([data-aegisblock-paused="true"]) [data-google-query-id],
-:root:not([data-aegisblock-paused="true"]) [data-ad-client],
-:root:not([data-aegisblock-paused="true"]) [data-ad-slot],
-:root:not([data-aegisblock-paused="true"]) [data-ad-unit],
-:root:not([data-aegisblock-paused="true"]) [data-ad-name],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="doubleclick.net"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="googlesyndication.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="amazon-adsystem.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="adnxs.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="rubiconproject.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="criteo.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="taboola.com"],
-:root:not([data-aegisblock-paused="true"]) iframe[src*="outbrain.com"],
-:root:not([data-aegisblock-paused="true"]) .taboola-widget,
-:root:not([data-aegisblock-paused="true"]) [id^="taboola-"],
-:root:not([data-aegisblock-paused="true"]) .OUTBRAIN,
-:root:not([data-aegisblock-paused="true"]) [data-widget-id^="outbrain"],
-:root:not([data-aegisblock-paused="true"]) .rc-wc,
-:root:not([data-aegisblock-paused="true"]) [id^="rc-widget-"],
-:root:not([data-aegisblock-paused="true"]) [class*="mgid-widget"],
-:root:not([data-aegisblock-paused="true"]) .ad-leaderboard,
-:root:not([data-aegisblock-paused="true"]) .ad-billboard,
-:root:not([data-aegisblock-paused="true"]) .ad- skyscraper,
-:root:not([data-aegisblock-paused="true"]) .ad-slot-container,
-:root:not([data-aegisblock-paused="true"]) .dfp-ad-unit,
-:root:not([data-aegisblock-paused="true"]) .sponsored-banner,
-:root:not([data-aegisblock-paused="true"]) [aria-label="Advertisement"],
-:root:not([data-aegisblock-paused="true"]) [aria-label="Sponsored Ad"],
-:root:not([data-aegisblock-paused="true"]) ytd-ad-slot-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-in-feed-ad-layout-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-promoted-sparkles-web-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-promoted-video-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-display-ad-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-statement-banner-renderer,
-:root:not([data-aegisblock-paused="true"]) ytd-banner-promo-renderer,
-:root:not([data-aegisblock-paused="true"]) #masthead-ad,
-:root:not([data-aegisblock-paused="true"]) #player-ads,
-:root:not([data-aegisblock-paused="true"]) .ytp-ad-overlay-container,
-:root:not([data-aegisblock-paused="true"]) .ytp-ad-message-container,
-:root:not([data-aegisblock-paused="true"]) .ytp-featured-product,
-:root:not([data-aegisblock-paused="true"]) .fc-ab-root,
-:root:not([data-aegisblock-paused="true"]) .fc-whitelist-root,
-:root:not([data-aegisblock-paused="true"]) .fc-dialog-overlay,
-:root:not([data-aegisblock-paused="true"]) [class^="admiral-"],
-:root:not([data-aegisblock-paused="true"]) [id^="admiral-"],
-:root:not([data-aegisblock-paused="true"]) [class*="fEy1Z2XT"],
-:root:not([data-aegisblock-paused="true"]) [data-aegis-hidden="true"] {
+:root:not([data-nulkast-block-paused="true"]) ins.adsbygoogle,
+:root:not([data-nulkast-block-paused="true"]) [id^="google_ads_iframe_"],
+:root:not([data-nulkast-block-paused="true"]) [id^="div-gpt-ad-"],
+:root:not([data-nulkast-block-paused="true"]) [data-google-query-id],
+:root:not([data-nulkast-block-paused="true"]) [data-ad-client],
+:root:not([data-nulkast-block-paused="true"]) [data-ad-slot],
+:root:not([data-nulkast-block-paused="true"]) [data-ad-unit],
+:root:not([data-nulkast-block-paused="true"]) [data-ad-name],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="doubleclick.net"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="googlesyndication.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="amazon-adsystem.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="adnxs.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="rubiconproject.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="criteo.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="taboola.com"],
+:root:not([data-nulkast-block-paused="true"]) iframe[src*="outbrain.com"],
+:root:not([data-nulkast-block-paused="true"]) .taboola-widget,
+:root:not([data-nulkast-block-paused="true"]) [id^="taboola-"],
+:root:not([data-nulkast-block-paused="true"]) .OUTBRAIN,
+:root:not([data-nulkast-block-paused="true"]) [data-widget-id^="outbrain"],
+:root:not([data-nulkast-block-paused="true"]) .rc-wc,
+:root:not([data-nulkast-block-paused="true"]) [id^="rc-widget-"],
+:root:not([data-nulkast-block-paused="true"]) [class*="mgid-widget"],
+:root:not([data-nulkast-block-paused="true"]) .ad-leaderboard,
+:root:not([data-nulkast-block-paused="true"]) .ad-billboard,
+:root:not([data-nulkast-block-paused="true"]) .ad- skyscraper,
+:root:not([data-nulkast-block-paused="true"]) .ad-slot-container,
+:root:not([data-nulkast-block-paused="true"]) .dfp-ad-unit,
+:root:not([data-nulkast-block-paused="true"]) .sponsored-banner,
+:root:not([data-nulkast-block-paused="true"]) [aria-label="Advertisement"],
+:root:not([data-nulkast-block-paused="true"]) [aria-label="Sponsored Ad"],
+:root:not([data-nulkast-block-paused="true"]) ytd-ad-slot-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-in-feed-ad-layout-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-promoted-sparkles-web-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-promoted-video-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-display-ad-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-statement-banner-renderer,
+:root:not([data-nulkast-block-paused="true"]) ytd-banner-promo-renderer,
+:root:not([data-nulkast-block-paused="true"]) #masthead-ad,
+:root:not([data-nulkast-block-paused="true"]) #player-ads,
+:root:not([data-nulkast-block-paused="true"]) .ytp-ad-overlay-container,
+:root:not([data-nulkast-block-paused="true"]) .ytp-ad-message-container,
+:root:not([data-nulkast-block-paused="true"]) .ytp-featured-product,
+:root:not([data-nulkast-block-paused="true"]) .fc-ab-root,
+:root:not([data-nulkast-block-paused="true"]) .fc-whitelist-root,
+:root:not([data-nulkast-block-paused="true"]) .fc-dialog-overlay,
+:root:not([data-nulkast-block-paused="true"]) [class^="admiral-"],
+:root:not([data-nulkast-block-paused="true"]) [id^="admiral-"],
+:root:not([data-nulkast-block-paused="true"]) [class*="fEy1Z2XT"],
+:root:not([data-nulkast-block-paused="true"]) [data-nulkast-hidden="true"] {
   display: none !important;
   visibility: hidden !important;
   height: 0 !important;
@@ -66,10 +66,10 @@
   pointer-events: none !important;
 }
 
-/* Restore scrolling when AegisBlock neutralizes an anti-adblock modal (e.g. Admiral / Funding Choices) */
-:root:not([data-aegisblock-paused="true"])[data-aegis-scroll-unlocked="true"],
-:root:not([data-aegisblock-paused="true"])[data-aegis-scroll-unlocked="true"] body,
-:root:not([data-aegisblock-paused="true"]) body[data-aegis-scroll-unlocked="true"] {
+/* Restore scrolling when NulKast-Block neutralizes an anti-adblock modal (e.g. Admiral / Funding Choices) */
+:root:not([data-nulkast-block-paused="true"])[data-nulkast-scroll-unlocked="true"],
+:root:not([data-nulkast-block-paused="true"])[data-nulkast-scroll-unlocked="true"] body,
+:root:not([data-nulkast-block-paused="true"]) body[data-nulkast-scroll-unlocked="true"] {
   overflow: auto !important;
   overflow-y: auto !important;
   position: static !important;

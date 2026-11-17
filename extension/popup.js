@@ -1,5 +1,5 @@
 /**
- * AegisBlock — Popup Controller
+ * NulKast-Block — Popup Controller
  */
 
 let currentTabId = -1;

@@ -496,7 +496,7 @@
     "1900": {
       "id": 1900,
       "ruleset": "ads_core",
-      "vendor": "AegisBlock Self-Learning Research Ruleset",
+      "vendor": "NulKast-Block Self-Learning Research Ruleset",
       "category": "Learned Ad/Tracker Network",
       "description": "Blocks 3 domain(s) synthesized by the Heuristic Research Engine",
       "patternSummary": "audience-graph-cdn.io (+2 more)"
