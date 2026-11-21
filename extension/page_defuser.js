@@ -4,6 +4,9 @@
  * Google Funding Choices, and BlockAdBlock before inline or tag-manager scripts can initialize them.
  */
 (() => {
+  if (window.__nulkastPageDefuserLoaded) return;
+  window.__nulkastPageDefuserLoaded = true;
+
   const isPaused = () =>
     document.documentElement &&
     document.documentElement.getAttribute("data-nulkast-block-paused") === "true";
@@ -20,7 +23,7 @@
 
   const admiralStub = function (cmd, eventName, callback) {
     if (isPaused()) return;
-    // Never fire "measure.detected" or "arget.detected" callbacks; if a script listens for non-blocked state, satisfy it
+    // Never fire "measure.detected" or "target.detected" callbacks
     if (cmd === "after" && typeof callback === "function" && /detected/i.test(String(eventName))) {
       return;
     }
@@ -35,11 +38,13 @@
         return admiralStub;
       },
       set() {},
-      configurable: false,
+      configurable: true,
       enumerable: true
     });
   } catch (_) {
-    window.admiral = admiralStub;
+    try {
+      window.admiral = admiralStub;
+    } catch (_) {}
   }
 
   // 2. Satisfy common global bait flags checked by publisher anti-adblock scripts
@@ -55,19 +60,40 @@
       configurable: true
     });
   } catch (_) {
-    window.canRunAds = true;
-    window.isAdBlockActive = false;
+    try {
+      window.canRunAds = true;
+      window.isAdBlockActive = false;
+    } catch (_) {}
   }
 
   // 3. Neutralize BlockAdBlock / FuckAdBlock constructors & instances
+  let fuckYourAdLogged = false;
+  const triggerFuckYourAd = () => {
+    try {
+      window.fuckYourAd = true;
+    } catch (_) {}
+    if (!fuckYourAdLogged) {
+      fuckYourAdLogged = true;
+      try {
+        console.info("[NulKast-Block] fuckAdBlock intercepted -> fuckYourAd");
+      } catch (_) {}
+    }
+  };
+
   const InertDetector = function () {};
+  InertDetector.prototype.reply = "fuckYourAd";
   InertDetector.prototype.on = function (detected, fn) {
-    if (!detected && typeof fn === "function") {
+    if (detected) {
+      triggerFuckYourAd();
+    } else if (typeof fn === "function") {
       try { fn(); } catch (_) {}
     }
     return this;
   };
-  InertDetector.prototype.onDetected = function () { return this; };
+  InertDetector.prototype.onDetected = function () {
+    triggerFuckYourAd();
+    return this;
+  };
   InertDetector.prototype.onNotDetected = function (fn) {
     if (typeof fn === "function") {
       try { fn(); } catch (_) {}
@@ -95,48 +121,32 @@
     }
   } catch (_) {}
 
-  // 4. Intercept dynamic <script> injection for known Admiral / anti-adblock bootstrapper URLs
+  // 4. Intercept dynamic <script> src assignment for known Admiral / anti-adblock bootstrapper URLs
+  // (Targets HTMLScriptElement.prototype.src instead of Node.prototype.appendChild/insertBefore
+  // so unrelated website DOMExceptions never appear in the extension error console.)
   const BLOCKED_SCRIPT_PATTERNS =
     /(getadmiral\.com|chalkdream\.com|succeedscene\.com|RCe0c7c73598674c2288fae1d365c8dd9d|fundingchoicesmessages\.google\.com|blockadblock|fuckadblock)/i;
 
-  function isBlockedAntiAdblockScript(node) {
-    if (isPaused() || !node || node.nodeType !== 1 || node.tagName !== "SCRIPT") return false;
-    const src = String(node.src || node.getAttribute("src") || "");
-    if (src && BLOCKED_SCRIPT_PATTERNS.test(src)) {
-      return true;
+  try {
+    const srcDesc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");
+    if (srcDesc && typeof srcDesc.set === "function" && typeof srcDesc.get === "function") {
+      Object.defineProperty(HTMLScriptElement.prototype, "src", {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return srcDesc.get.call(this);
+        },
+        set(val) {
+          if (!isPaused() && val && BLOCKED_SCRIPT_PATTERNS.test(String(val))) {
+            try {
+              this.type = "text/plain";
+              this.setAttribute("data-nulkast-stripped", "admiral-script");
+            } catch (_) {}
+            return;
+          }
+          return srcDesc.set.call(this, val);
+        }
+      });
     }
-    const text = String(node.textContent || "");
-    if (
-      text &&
-      (text.includes("window,\"admiral\"") ||
-        text.includes("window,'admiral'") ||
-        text.includes("chalkdream.com") ||
-        text.includes("getadmiral.com"))
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  const origInsertBefore = Node.prototype.insertBefore;
-  Node.prototype.insertBefore = function (newNode, refNode) {
-    if (isBlockedAntiAdblockScript(newNode)) {
-      const dummy = document.createElement("script");
-      dummy.type = "text/plain";
-      dummy.setAttribute("data-nulkast-stripped", "admiral-script");
-      return origInsertBefore.call(this, dummy, refNode);
-    }
-    return origInsertBefore.call(this, newNode, refNode);
-  };
-
-  const origAppendChild = Node.prototype.appendChild;
-  Node.prototype.appendChild = function (newNode) {
-    if (isBlockedAntiAdblockScript(newNode)) {
-      const dummy = document.createElement("script");
-      dummy.type = "text/plain";
-      dummy.setAttribute("data-nulkast-stripped", "admiral-script");
-      return origAppendChild.call(this, dummy);
-    }
-    return origAppendChild.call(this, newNode);
-  };
+  } catch (_) {}
 })();

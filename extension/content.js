@@ -20,6 +20,25 @@
   const inspectedResourceUrls = new Set();
   const inspectedIframes = new WeakSet();
 
+  function safeSendMessage(payload, callback) {
+    try {
+      if (!chrome || !chrome.runtime || !chrome.runtime.id) return;
+      if (typeof callback === "function") {
+        chrome.runtime.sendMessage(payload, (resp) => {
+          if (chrome.runtime.lastError) return;
+          callback(resp);
+        });
+      } else {
+        const res = chrome.runtime.sendMessage(payload);
+        if (res && typeof res.catch === "function") {
+          res.catch(() => {});
+        }
+      }
+    } catch (_) {
+      // Extension context was invalidated after reload; silently ignore
+    }
+  }
+
   // Standard IAB Ad Unit Dimensions (width x height)
   const IAB_AD_SIZES = new Set([
     "300x250", // Medium Rectangle
@@ -133,12 +152,12 @@
         const batch = pendingCosmeticBatch.splice(0, pendingCosmeticBatch.length);
         cosmeticFlushTimer = null;
         if (batch.length > 0 && !isSitePaused) {
-          chrome.runtime.sendMessage({
+          safeSendMessage({
             type: "REPORT_COSMETIC_TELEMETRY",
             site: CURRENT_HOST,
             count: batch.length,
             samples: batch.slice(0, 10)
-          }).catch(() => {});
+          });
         }
       }, 900);
     }
@@ -181,11 +200,11 @@
         btn.click();
         if (Date.now() - lastVideoSkipTs > 2500) {
           lastVideoSkipTs = Date.now();
-          chrome.runtime.sendMessage({
+          safeSendMessage({
             type: "REPORT_VIDEO_AD_MITIGATED",
             site: CURRENT_HOST,
             method: `Auto-Skip (${sel})`
-          }).catch(() => {});
+          });
         }
       }
     }
@@ -199,11 +218,11 @@
         adPlayer.currentTime = Math.max(0, adPlayer.duration - 0.1);
         if (Date.now() - lastVideoSkipTs > 2500) {
           lastVideoSkipTs = Date.now();
-          chrome.runtime.sendMessage({
+          safeSendMessage({
             type: "REPORT_VIDEO_AD_MITIGATED",
             site: CURRENT_HOST,
             method: "Pre-Roll Fast-Forward"
-          }).catch(() => {});
+          });
         }
       }
     }
@@ -342,12 +361,12 @@
           inspectedLeakNodes.add(node);
           node.setAttribute("data-nulkast-hidden", "true");
           node.style.setProperty("display", "none", "important");
-          chrome.runtime.sendMessage({
+          safeSendMessage({
             type: "REPORT_VISUAL_AD_LEAK",
             site: CURRENT_HOST,
             selector: sel,
             dimensions: `${Math.round(rect.width)}x${Math.round(rect.height)}`
-          }).catch(() => {});
+          });
         }
       }
     }
@@ -460,12 +479,12 @@
       unlockPageScroll();
       if (!antiAdblockWallReported) {
         antiAdblockWallReported = true;
-        chrome.runtime.sendMessage({
+        safeSendMessage({
           type: "REPORT_BREAKAGE_DIAGNOSTIC",
           site: CURRENT_HOST,
           reason: "ANTI_ADBLOCK_WALL_NEUTRALIZED",
           detail: wallDetail
-        }).catch(() => {});
+        });
       }
     }
   }
@@ -484,13 +503,13 @@
             const failedHost = parsed.hostname.toLowerCase().replace(/^www\./, "");
             if (failedHost && isThirdPartyHost(failedHost)) {
               breakageReportsSent += 1;
-              chrome.runtime.sendMessage({
+              safeSendMessage({
                 type: "REPORT_BREAKAGE_DIAGNOSTIC",
                 site: CURRENT_HOST,
                 reason: "SCRIPT_LOAD_BLOCKED",
                 failedHost,
                 detail: parsed.href.slice(0, 180)
-              }).catch(() => {});
+              });
             }
           } catch (_) {}
           return;
@@ -503,12 +522,12 @@
         );
         if (sdkMatch) {
           breakageReportsSent += 1;
-          chrome.runtime.sendMessage({
+          safeSendMessage({
             type: "REPORT_BREAKAGE_DIAGNOSTIC",
             site: CURRENT_HOST,
             reason: `MISSING_SDK_GLOBAL(${sdkMatch[1]})`,
             detail: msg.slice(0, 160)
-          }).catch(() => {});
+          });
         }
       },
       true
@@ -551,7 +570,7 @@
       }
 
       if (score >= 48) {
-        chrome.runtime.sendMessage({
+        safeSendMessage({
           type: "REPORT_HEURISTIC_SUSPECT",
           suspect: {
             candidateHost: host,
@@ -563,7 +582,7 @@
             category: "Suspect Ad Iframe",
             signals
           }
-        }).catch(() => {});
+        });
       }
     }
   }
@@ -576,10 +595,10 @@
         for (const entry of entries) {
           const suspect = evaluateResourceHeuristics(entry.name, entry.initiatorType || "other");
           if (suspect) {
-            chrome.runtime.sendMessage({
+            safeSendMessage({
               type: "REPORT_HEURISTIC_SUSPECT",
               suspect
-            }).catch(() => {});
+            });
           }
         }
       };
@@ -775,11 +794,11 @@
         customSelectors.push(sel);
         applyCustomSelectors(customSelectors);
       }
-      chrome.runtime.sendMessage({
+      safeSendMessage({
         type: "SAVE_CUSTOM_SELECTOR",
         site: CURRENT_HOST,
         selector: sel
-      }).catch(() => {});
+      });
     }
     stopElementZapper();
   }
@@ -815,8 +834,8 @@
   });
 
   function bootstrap() {
-    chrome.runtime.sendMessage({ type: "GET_SITE_CONFIG", site: CURRENT_HOST }, (resp) => {
-      if (chrome.runtime.lastError || !resp) return;
+    safeSendMessage({ type: "GET_SITE_CONFIG", site: CURRENT_HOST }, (resp) => {
+      if (!resp) return;
       applyPauseState(resp.isPaused);
       applyCustomSelectors(resp.customSelectors || []);
       if (!resp.isPaused) {

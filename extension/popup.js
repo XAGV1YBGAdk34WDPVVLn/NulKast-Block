@@ -24,6 +24,15 @@ function showToast(text) {
   }, 1800);
 }
 
+function sendMsg(payload, cb) {
+  try {
+    chrome.runtime.sendMessage(payload, (resp) => {
+      if (chrome.runtime.lastError) return;
+      if (typeof cb === "function") cb(resp);
+    });
+  } catch (_) {}
+}
+
 function renderPopup(data) {
   const shieldCard = document.getElementById("shield-card");
   const statusText = document.getElementById("status-text");
@@ -79,6 +88,28 @@ function renderPopup(data) {
   document.getElementById("total-rules").textContent = `${staticCount} + ${dynCount} learned`;
 
   document.getElementById("chk-autolearn").checked = Boolean(data.autoLearnEnabled);
+
+  const chkCaptcha = document.getElementById("chk-allow-captcha");
+  const captchaSub = document.getElementById("captcha-toggle-sub");
+  if (chkCaptcha) {
+    if (data.allowCaptchaGlobally) {
+      chkCaptcha.checked = true;
+      chkCaptcha.disabled = true;
+      if (captchaSub) captchaSub.textContent = "Allowed globally (manage in Analytics Lab)";
+    } else if (!currentSite) {
+      chkCaptcha.checked = false;
+      chkCaptcha.disabled = true;
+      if (captchaSub) captchaSub.textContent = "Open a website to allow CAPTCHAs per-site";
+    } else {
+      chkCaptcha.disabled = false;
+      chkCaptcha.checked = Boolean(data.siteCaptchaExplicit);
+      if (captchaSub) {
+        captchaSub.textContent = data.siteCaptchaExplicit
+          ? "CAPTCHAs & bot checks allowed on this site"
+          : "Allow reCAPTCHA, Turnstile, hCaptcha & bot checks";
+      }
+    }
+  }
 
   // Render Heuristic Suspects
   const suspects = data.siteSuspects || [];
@@ -198,7 +229,7 @@ async function refreshPopup() {
     }
   }
 
-  chrome.runtime.sendMessage(
+  sendMsg(
     {
       type: "GET_POPUP_DATA",
       tabId: currentTabId,
@@ -227,6 +258,26 @@ document.addEventListener("DOMContentLoaded", () => {
         if (resp && resp.ok) {
           refreshPopup();
         }
+      }
+    );
+  });
+
+  document.getElementById("chk-allow-captcha").addEventListener("change", (e) => {
+    if (!currentSite) return;
+    const enabled = e.target.checked;
+    chrome.runtime.sendMessage(
+      {
+        type: "TOGGLE_SITE_CAPTCHA",
+        site: currentSite,
+        enabled
+      },
+      () => {
+        showToast(
+          enabled
+            ? `CAPTCHAs allowed on ${currentSite} — reload if needed`
+            : `CAPTCHA allowance removed for ${currentSite}`
+        );
+        refreshPopup();
       }
     );
   });

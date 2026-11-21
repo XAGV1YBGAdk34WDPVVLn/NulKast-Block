@@ -9,8 +9,50 @@
 const STORAGE_KEY = "nulkast_block_state_v1";
 const ALLOWLIST_RULE_ID_BASE = 50000;
 const SITE_EXCEPTION_RULE_ID_BASE = 60000;
+const CAPTCHA_ALLOW_RULE_ID_BASE = 70000;
 const DYNAMIC_BLOCK_RULE_ID_BASE = 10000;
 const MAX_RECENT_EVENTS = 250;
+
+// Major CAPTCHA, Proof-of-Work & Human Verification provider domains
+const CAPTCHA_PROVIDER_DOMAINS = [
+  "recaptcha.net",
+  "hcaptcha.com",
+  "challenges.cloudflare.com",
+  "arkoselabs.com",
+  "funcaptcha.com",
+  "arkose.com",
+  "perimeterx.net",
+  "px-cdn.net",
+  "px-cloud.net",
+  "pxchk.net",
+  "px-client.net",
+  "humansecurity.com",
+  "whiteops.com",
+  "datadome.co",
+  "captcha-delivery.com",
+  "geetest.com",
+  "friendlycaptcha.com",
+  "mtcaptcha.com",
+  "captchafox.com",
+  "awswaf.com",
+  "kasada.io",
+  "fpjs.io",
+  "fingerprintjs.com",
+  "fpnpmcdn.net",
+  "threatmetrix.com",
+  "online-metrix.net",
+  "iovation.com",
+  "iesnare.com",
+  "sift.com",
+  "siftscience.com",
+  "socure.com",
+  "forther.com",
+  "maxmind.com",
+  "protechts.net",
+  "imperva.com",
+  "incapsula.com"
+];
+const CAPTCHA_PROVIDER_DOMAIN_SET = new Set(CAPTCHA_PROVIDER_DOMAINS);
 
 // Estimated average payload bytes saved per blocked resource type
 const BYTES_SAVED_BY_TYPE = {
@@ -40,6 +82,8 @@ function createDefaultState() {
     globalEnabled: true,
     autoLearnEnabled: false,
     autoLearnThreshold: 85,
+    allowCaptchaGlobally: false,
+    captchaAllowedSites: [],
     allowlistedSites: [],
     customSelectorsBySite: {}, // { "example.com": ["#promo-box"] }
     dynamicBlockRules: [],     // [{ id, domain, category, source, createdAt, confidence, signals }]
@@ -389,7 +433,16 @@ if (
 // ============================================================================
 // 2. Dynamic DNR Rules Sync (Allowlist + Custom/Learned Block Rules)
 // ============================================================================
-async function syncDynamicDnrRules() {
+let dnrSyncChain = Promise.resolve();
+
+function syncDynamicDnrRules() {
+  dnrSyncChain = dnrSyncChain.then(() => _syncDynamicDnrRulesImpl()).catch((err) => {
+    console.warn("[NulKast-Block] DNR sync warning:", err);
+  });
+  return dnrSyncChain;
+}
+
+async function _syncDynamicDnrRulesImpl() {
   const state = await ensureState();
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
   const removeRuleIds = existing.map((r) => r.id);
@@ -459,6 +512,84 @@ async function syncDynamicDnrRules() {
         }
       });
     });
+
+    // CAPTCHA & Human Verification Allow Rules (Priority 7000 overrides static & dynamic blocks)
+    const captchaInitiators = Array.from(
+      new Set(
+        (state.captchaAllowedSites || [])
+          .map((s) => extractBaseDomain(s) || normalizeHost(s))
+          .filter(Boolean)
+      )
+    );
+    if (state.allowCaptchaGlobally || captchaInitiators.length > 0) {
+      const baseCond = state.allowCaptchaGlobally ? {} : { initiatorDomains: captchaInitiators };
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 1,
+        priority: 7000,
+        action: { type: "allow" },
+        condition: {
+          ...baseCond,
+          requestDomains: CAPTCHA_PROVIDER_DOMAINS
+        }
+      });
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 2,
+        priority: 7000,
+        action: { type: "allowAllRequests" },
+        condition: {
+          ...baseCond,
+          requestDomains: CAPTCHA_PROVIDER_DOMAINS,
+          resourceTypes: ["main_frame", "sub_frame"]
+        }
+      });
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 3,
+        priority: 7000,
+        action: { type: "allow" },
+        condition: {
+          ...baseCond,
+          urlFilter: "||google.com/recaptcha/"
+        }
+      });
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 4,
+        priority: 7000,
+        action: { type: "allow" },
+        condition: {
+          ...baseCond,
+          urlFilter: "||gstatic.com/recaptcha/"
+        }
+      });
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 5,
+        priority: 7000,
+        action: { type: "allowAllRequests" },
+        condition: {
+          ...baseCond,
+          urlFilter: "||google.com/recaptcha/",
+          resourceTypes: ["main_frame", "sub_frame"]
+        }
+      });
+      addRules.push({
+        id: CAPTCHA_ALLOW_RULE_ID_BASE + 6,
+        priority: 7000,
+        action: { type: "allow" },
+        condition: {
+          ...baseCond,
+          urlFilter: "/captcha",
+          resourceTypes: [
+            "sub_frame",
+            "stylesheet",
+            "script",
+            "image",
+            "font",
+            "xmlhttprequest",
+            "ping",
+            "other"
+          ]
+        }
+      });
+    }
 
     // User custom & heuristic-promoted dynamic block rules
     for (const dyn of state.dynamicBlockRules) {
@@ -544,6 +675,13 @@ async function ingestHeuristicSuspect(suspect, senderTabId = -1) {
   const baseDomain = extractBaseDomain(host) || host;
 
   if (state.ignoredSuspects.includes(host) || state.ignoredSuspects.includes(baseDomain)) {
+    return;
+  }
+  const initSite = normalizeHost(suspect.initiatorSite);
+  const captchaAllowedHere =
+    state.allowCaptchaGlobally ||
+    (initSite && (state.captchaAllowedSites || []).some((s) => s === initSite || extractBaseDomain(s) === extractBaseDomain(initSite)));
+  if (captchaAllowedHere && (CAPTCHA_PROVIDER_DOMAIN_SET.has(host) || CAPTCHA_PROVIDER_DOMAIN_SET.has(baseDomain))) {
     return;
   }
   if (isDomainAlreadyBlocked(host, state)) {
@@ -863,10 +1001,11 @@ chrome.runtime.onInstalled.addListener(async () => {
 // ============================================================================
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   (async () => {
-    const state = await ensureState();
-    const senderTabId = sender && sender.tab && typeof sender.tab.id === "number" ? sender.tab.id : -1;
+    try {
+      const state = await ensureState();
+      const senderTabId = sender && sender.tab && typeof sender.tab.id === "number" ? sender.tab.id : -1;
 
-    switch (msg.type) {
+      switch (msg.type) {
       case "GET_SITE_CONFIG": {
         const site = normalizeHost(msg.site);
         const isPaused = !state.globalEnabled || state.allowlistedSites.includes(site);
@@ -1104,11 +1243,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           .sort((a, b) => b.lastSeen - a.lastSeen)
           .slice(0, 3);
 
+        const siteCaptchaExplicit = Boolean(
+          site && (state.captchaAllowedSites || []).includes(site)
+        );
         sendResponse({
           ok: true,
           globalEnabled: state.globalEnabled,
           autoLearnEnabled: state.autoLearnEnabled,
           autoLearnThreshold: state.autoLearnThreshold,
+          allowCaptchaGlobally: Boolean(state.allowCaptchaGlobally),
+          siteCaptchaExplicit,
+          isCaptchaAllowedForSite: Boolean(state.allowCaptchaGlobally || siteCaptchaExplicit),
           site,
           isSitePaused,
           tabStats: tTracker || { blocked: 0, sanitized: 0, cosmetic: 0, video: 0, recentDomains: [], suspects: [] },
@@ -1163,6 +1308,43 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           }).catch(() => {});
         }
         sendResponse({ ok: true, isPaused: !state.globalEnabled || isPaused, allowlistedSites: state.allowlistedSites });
+        return;
+      }
+
+      case "TOGGLE_SITE_CAPTCHA": {
+        const site = normalizeHost(msg.site);
+        if (!site) {
+          sendResponse({ ok: false });
+          return;
+        }
+        if (!Array.isArray(state.captchaAllowedSites)) state.captchaAllowedSites = [];
+        const idx = state.captchaAllowedSites.indexOf(site);
+        const targetEnabled = typeof msg.enabled === "boolean" ? msg.enabled : idx < 0;
+        if (targetEnabled && idx < 0) {
+          state.captchaAllowedSites.push(site);
+        } else if (!targetEnabled && idx >= 0) {
+          state.captchaAllowedSites.splice(idx, 1);
+        }
+        await syncDynamicDnrRules();
+        scheduleSaveState();
+        sendResponse({
+          ok: true,
+          site,
+          siteCaptchaExplicit: state.captchaAllowedSites.includes(site),
+          allowCaptchaGlobally: Boolean(state.allowCaptchaGlobally),
+          captchaAllowedSites: state.captchaAllowedSites
+        });
+        return;
+      }
+
+      case "TOGGLE_GLOBAL_CAPTCHA": {
+        state.allowCaptchaGlobally = Boolean(msg.enabled);
+        await syncDynamicDnrRules();
+        scheduleSaveState();
+        sendResponse({
+          ok: true,
+          allowCaptchaGlobally: state.allowCaptchaGlobally
+        });
         return;
       }
 
@@ -1278,6 +1460,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       case "RESET_TELEMETRY": {
         const fresh = createDefaultState();
         fresh.allowlistedSites = state.allowlistedSites;
+        fresh.captchaAllowedSites = state.captchaAllowedSites || [];
+        fresh.allowCaptchaGlobally = Boolean(state.allowCaptchaGlobally);
         fresh.customSelectorsBySite = state.customSelectorsBySite;
         fresh.dynamicBlockRules = state.dynamicBlockRules;
         fresh.globalEnabled = state.globalEnabled;
@@ -1290,6 +1474,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
       default:
         sendResponse({ ok: false, error: `Unknown message type: ${msg.type}` });
+      }
+    } catch (err) {
+      sendResponse({ ok: false, error: String(err && err.message ? err.message : err) });
     }
   })();
   return true;

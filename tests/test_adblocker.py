@@ -335,6 +335,26 @@ class TestNulKastBlockExtension(unittest.TestCase):
             domain: 'thirdparty-ads.example.org'
           });
 
+          // 6b. Toggle per-site CAPTCHA allowance & verify popup state + dynamic rules
+          const captchaSiteResp = await sendMsg({
+            type: 'TOGGLE_SITE_CAPTCHA',
+            site: 'login-portal.example.com',
+            enabled: true
+          });
+          const popupCaptchaResp = await sendMsg({
+            type: 'GET_POPUP_DATA',
+            tabId: 1,
+            site: 'login-portal.example.com'
+          });
+          const siteCaptchaRules = [...dynamicRules];
+
+          // 6c. Toggle global CAPTCHA allowance & verify dynamic rules
+          const captchaGlobalResp = await sendMsg({
+            type: 'TOGGLE_GLOBAL_CAPTCHA',
+            enabled: true
+          });
+          const globalCaptchaRules = [...dynamicRules];
+
           // 7. Fetch full dashboard state
           const dashResp = await sendMsg({ type: 'GET_DASHBOARD_STATE' });
 
@@ -342,6 +362,11 @@ class TestNulKastBlockExtension(unittest.TestCase):
             bulkPromotedCount: bulkResp.promotedCount,
             isPaused: pauseResp.isPaused,
             dynamicRules,
+            siteCaptchaRules,
+            globalCaptchaRules,
+            captchaSiteResp,
+            popupCaptchaResp,
+            captchaGlobalResp,
             metrics: dashResp.state.metrics,
             customSelectors: dashResp.state.customSelectorsBySite['news-portal.com'],
             falsePositives: dashResp.state.falsePositiveReports,
@@ -365,11 +390,16 @@ class TestNulKastBlockExtension(unittest.TestCase):
         self.assertGreaterEqual(out["metrics"]["falsePositivesFlagged"], 1)
         self.assertIn("#floating-ad-banner", out["customSelectors"])
         self.assertEqual(len(out["siteDomainExceptions"]), 1)
+        self.assertTrue(out["captchaSiteResp"]["siteCaptchaExplicit"])
+        self.assertTrue(out["popupCaptchaResp"]["isCaptchaAllowedForSite"])
+        self.assertTrue(out["captchaGlobalResp"]["allowCaptchaGlobally"])
 
-        # Validate every dynamically generated rule produced by background.js against Chromium's C++ rule validator!
-        self.assertGreaterEqual(len(out["dynamicRules"]), 4)
-        for dyn_rule in out["dynamicRules"]:
-            validate_chromium_dnr_rule(dyn_rule, "dynamic_rules")
+        # Validate every dynamically generated rule (both per-site and global CAPTCHA modes) against Chromium's C++ rule validator!
+        self.assertGreaterEqual(len(out["siteCaptchaRules"]), 10)
+        for dyn_rule in out["siteCaptchaRules"]:
+            validate_chromium_dnr_rule(dyn_rule, "dynamic_rules_site_captcha")
+        for dyn_rule in out["globalCaptchaRules"]:
+            validate_chromium_dnr_rule(dyn_rule, "dynamic_rules_global_captcha")
 
     def test_06_windows_unpacked_extension_sync_parity(self):
         """Verifies that the synced unpacked extension directory matches extension/ byte-for-byte."""

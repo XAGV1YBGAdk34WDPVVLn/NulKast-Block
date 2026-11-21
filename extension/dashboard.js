@@ -242,6 +242,10 @@ function renderDashboard() {
   // TAB 2: HEURISTIC DISCOVERY & RULE LAB
   // ==========================================================================
   document.getElementById("dash-chk-autolearn").checked = Boolean(currentState.autoLearnEnabled);
+  const dashCaptchaChk = document.getElementById("dash-chk-allow-captcha-global");
+  if (dashCaptchaChk) {
+    dashCaptchaChk.checked = Boolean(currentState.allowCaptchaGlobally);
+  }
 
   const suspectsBody = document.getElementById("tbody-suspects");
   suspectsBody.innerHTML = "";
@@ -496,6 +500,28 @@ function renderDashboard() {
       tr.lastElementChild.appendChild(btnDel);
       allowBody.appendChild(tr);
     }
+  }
+
+  for (const site of currentState.captchaAllowedSites || []) {
+    hasAllowOrZap = true;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono" style="font-weight: 700;">${site}</td>
+      <td><span class="tag blue">CAPTCHAs &amp; Bot Checks Allowed</span></td>
+      <td></td>
+    `;
+    const btnRemove = document.createElement("button");
+    btnRemove.className = "btn danger";
+    btnRemove.style.cssText = "padding: 3px 8px; font-size: 11px; min-height: 26px;";
+    btnRemove.textContent = "Remove";
+    btnRemove.addEventListener("click", () => {
+      chrome.runtime.sendMessage({ type: "TOGGLE_SITE_CAPTCHA", site, enabled: false }, () => {
+        showToast(`Removed CAPTCHA allowance for ${site}`);
+        fetchDashboardState();
+      });
+    });
+    tr.lastElementChild.appendChild(btnRemove);
+    allowBody.appendChild(tr);
   }
 
   for (const exc of currentState.siteDomainExceptions || []) {
@@ -772,6 +798,24 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchDashboardState();
     });
   });
+
+  // Global Allow CAPTCHAs toggle
+  const dashCaptchaChk = document.getElementById("dash-chk-allow-captcha-global");
+  if (dashCaptchaChk) {
+    dashCaptchaChk.addEventListener("change", (e) => {
+      const enabled = e.target.checked;
+      chrome.runtime.sendMessage(
+        {
+          type: "TOGGLE_GLOBAL_CAPTCHA",
+          enabled
+        },
+        () => {
+          showToast(enabled ? "CAPTCHAs & bot checks allowed globally" : "Global CAPTCHA allowance disabled");
+          fetchDashboardState();
+        }
+      );
+    });
+  }
 
   // Heuristic Lab controls
   document.getElementById("dash-chk-autolearn").addEventListener("change", (e) => {

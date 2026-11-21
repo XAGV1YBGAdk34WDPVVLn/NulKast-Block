@@ -29,7 +29,7 @@
 :root:not([data-nulkast-block-paused="true"]) [class*="mgid-widget"],
 :root:not([data-nulkast-block-paused="true"]) .ad-leaderboard,
 :root:not([data-nulkast-block-paused="true"]) .ad-billboard,
-:root:not([data-nulkast-block-paused="true"]) .ad- skyscraper,
+:root:not([data-nulkast-block-paused="true"]) .ad-skyscraper,
 :root:not([data-nulkast-block-paused="true"]) .ad-slot-container,
 :root:not([data-nulkast-block-paused="true"]) .dfp-ad-unit,
 :root:not([data-nulkast-block-paused="true"]) .sponsored-banner,
